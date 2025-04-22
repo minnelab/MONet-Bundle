@@ -1,0 +1,11 @@
+
+run:
+- "$torch.save(@checkpoint,@checkpoint_filename)"
+- "$shutil.copy(Path(@nnunet_model_folder).joinpath('dataset.json'), @bundle_root+'/models/dataset.json')"
+- "$shutil.copy(Path(@nnunet_model_folder).joinpath('plans.json'), @bundle_root+'/models/plans.json')"
+- "$@train#pbar.attach(@train#trainer,output_transform=lambda x: {'loss': x[0]['loss']})"
+- "$@validate#pbar.attach(@validate#evaluator,metric_names=['Val_Dice'])"
+- $@train#trainer.run()
+
+initialize:
+- $monai.utils.set_determinism(seed=123)

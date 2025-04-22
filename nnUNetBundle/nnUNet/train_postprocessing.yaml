@@ -1,0 +1,38 @@
+
+train_postprocessing:
+  _target_: "Compose"
+  transforms:
+  - _target_: Lambdad
+    keys:
+      - "pred"
+      - "label"
+    func: "$lambda x: x[0]"
+  - _target_: Activationsd
+    keys:
+      - "pred"
+    softmax: True
+  - _target_: AsDiscreted
+    keys:
+      - "pred"
+    threshold: 0.5
+  - _target_: AsDiscreted
+    keys:
+      - "label"
+    to_onehot: "@num_classes"
+    
+train_postprocessing_region_based:
+  _target_: "Compose"
+  transforms:
+  - _target_: Lambdad
+    keys:
+      - "pred"
+      - "label"
+    func: "$lambda x: x[0]"
+  - _target_: Activationsd
+    keys:
+      - "pred"
+    sigmoid: True
+  - _target_: AsDiscreted
+    keys:
+      - "pred"
+    threshold: 0.5

@@ -1,0 +1,14 @@
+
+train_key_metric:
+  Train_Dice:
+    _target_: "MeanDice"
+    include_background: False
+    output_transform: "$monai.handlers.from_engine(['pred', 'label'])"
+    reduction: "mean"
+
+train_additional_metrics:
+  Train_Dice_per_class:
+    _target_: "MeanDice"
+    include_background: False
+    output_transform: "$monai.handlers.from_engine(['pred', 'label'])"
+    reduction: "mean_batch"

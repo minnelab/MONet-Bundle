@@ -1,0 +1,8 @@
+dataset_json:
+  channel_names:
+    '0': CT
+  file_ending: .nii.gz
+  labels:
+    background: 0
+    class1: 1
+  numTraining: 41

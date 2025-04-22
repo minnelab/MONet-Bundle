@@ -1,0 +1,27 @@
+
+val_handlers:
+  handlers:
+  - _target_: StatsHandler
+    iteration_log: false
+  - _target_: TensorBoardStatsHandler
+    iteration_log: false
+    log_dir: '@log_dir'
+  - _target_: "$src.mlflow.MLFlownnUNetHandler"
+    label_dict: "@label_dict"
+    tracking_uri: "@tracking_uri"
+    experiment_name: "@mlflow_experiment_name"
+    run_name: "@mlflow_run_name"
+    output_transform: "$src.mlflow.mlflow_transform"
+    iteration_log: False
+    state_attributes:
+    - "best_metric"
+    - "best_metric_epoch"
+  - _target_: "CheckpointSaver"
+    save_dir: "@ckpt_dir"
+    save_interval: 1
+    n_saved: 1
+    save_key_metric: true
+    save_dict:
+      network_weights: '$@nnunet_trainer.network._orig_mod'
+      optimizer_state: '$@nnunet_trainer.optimizer'
+      scheduler: '$@nnunet_trainer.lr_scheduler'

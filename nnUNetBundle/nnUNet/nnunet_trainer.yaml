@@ -1,0 +1,25 @@
+
+nnunet_trainer:
+  _target_ : get_nnunet_trainer
+  dataset_name_or_id: "@dataset_name_or_id"
+  configuration: "@nnunet_configuration"
+  fold: 0
+  trainer_class_name: "@nnunet_trainer_class_name"
+  plans_identifier: "@nnunet_plans_identifier"
+
+loss: $@nnunet_trainer.loss
+lr_scheduler: $@nnunet_trainer.lr_scheduler
+
+network: $@nnunet_trainer.network
+
+optimizer: $@nnunet_trainer.optimizer
+
+checkpoint:
+  init_args: '$@nnunet_trainer.my_init_kwargs'
+  trainer_name: '$@nnunet_trainer.__class__.__name__'
+  inference_allowed_mirroring_axes: '$@nnunet_trainer.inference_allowed_mirroring_axes'
+
+checkpoint_filename: "$@bundle_root+'/models/nnunet_checkpoint.pth'"
+
+dataset_name: "$nnunetv2.utilities.dataset_name_id_conversion.maybe_convert_to_dataset_name(@dataset_name_or_id)"
+nnunet_model_folder: "$os.path.join(os.environ['nnUNet_results'], @dataset_name, @nnunet_trainer_class_name+'__'+@nnunet_plans_identifier+'__'+@nnunet_configuration)"

@@ -1,0 +1,27 @@
+
+train:
+  pbar:
+    _target_: "ignite.contrib.handlers.tqdm_logger.ProgressBar"
+  dataloader: $@nnunet_trainer.dataloader_train
+  train_data: "$[{'case_identifier':k} for k in @nnunet_trainer.dataloader_train.generator._data.identifiers]"
+  train_dataset:
+    _target_: Dataset
+    data: "@train#train_data"
+  inferer:
+    _target_: SimpleInferer
+  trainer:
+    _target_: SupervisedTrainer
+    amp: true
+    device: '@device'
+    additional_metrics: "@train_additional_metrics"
+    epoch_length: "@iterations"
+    inferer: '@train#inferer'
+    key_train_metric: '@train_key_metric'
+    loss_function: '@loss'
+    max_epochs: '@epochs'
+    network: '@network'
+    prepare_batch: "$src.trainer.prepare_nnunet_batch"
+    optimizer: '@optimizer'
+    postprocessing: '@train_postprocessing'
+    train_data_loader: '@train#dataloader'
+    train_handlers: '@train_handlers#handlers'

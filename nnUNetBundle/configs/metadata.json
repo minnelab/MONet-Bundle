@@ -1,0 +1,55 @@
+
+{
+    "schema": "https://github.com/Project-MONAI/MONAI-extra-test-data/releases/download/0.8.1/meta_schema_20220324.json",
+    "version": "0.1.0",
+    "changelog": {
+        "0.1.0": "Initial release"
+    },
+    "monai_version": "1.4.0",
+    "pytorch_version": "2.3.0",
+    "numpy_version": "1.21.2",
+    "required_packages_version": {"nnunetv2": "2.6.0"},
+    "task": "Decathlon spleen segmentation with nnUNet",
+    "description": "A pre-trained  nnUNet model for volumetric (3D) segmentation of the spleen from CT image",
+    "authors": "Simone Bendazzoli",
+    "copyright": "Copyright (c) MONAI Consortium",
+    "data_source": "Task09_Spleen.tar from http://medicaldecathlon.com/",
+    "data_type": "nifti",
+    "image_classes": "single channel data, intensity scaled to [0, 1]",
+    "label_classes": "single channel data, 1 is spleen, 0 is everything else",
+    "pred_classes": "2 channels OneHot data, channel 1 is spleen, channel 0 is background",
+    "eval_metrics": {
+        "mean_dice": 0.97
+    },
+    "intended_use": "This is an example, not to be used for diagnostic purposes",
+    "references": [
+        "Isensee, F., Jaeger, P. F., Kohl, S. A., Petersen, J., & Maier-Hein, K. H. (2021). nnU-Net: a self-configuring method for deep learning-based biomedical image segmentation. Nature methods, 18(2), 203-211."
+    ],
+    "network_data_format":{
+        "inputs": {
+            "image": {
+                "type": "image",
+                "format": "hounsfield",
+                "modality": "CT",
+                "num_channels": 1,
+                "spatial_shape": ["*", "*", "*"],
+                "dtype": "float32",
+                "value_range": [-1024, 1024],
+                "is_patch_data": false,
+                "channel_def": {"0": "image"}
+            }
+        },
+        "outputs":{
+            "pred": {
+                "type": "image",
+                "format": "segmentation",
+                "num_channels": 1,
+                "spatial_shape": ["*", "*", "*"],
+                "dtype": "float32",
+                "value_range": [0,1],
+                "is_patch_data": false,
+                "channel_def": {"0": "background", "1": "spleen"}
+            }
+        }
+    }
+}

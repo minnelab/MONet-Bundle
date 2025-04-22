@@ -1,0 +1,47 @@
+
+run:
+- '$src.trainer.reload_checkpoint(@train#trainer,@reload_checkpoint_epoch,@iterations,@ckpt_dir)'
+- "$@train#pbar.attach(@train#trainer,output_transform=lambda x: {'loss': x[0]['loss']})"
+- "$@validate#pbar.attach(@validate#evaluator,metric_names=['Val_Dice'])"
+- $@train#trainer.run()
+
+train_handlers:
+  handlers:
+  - _target_: "$src.mlflow.MLFlownnUNetHandler"
+    label_dict: "@label_dict"
+    tracking_uri: "@tracking_uri"
+    experiment_name: "@mlflow_experiment_name"
+    run_name: "@mlflow_run_name"
+    output_transform: "$src.mlflow.mlflow_transform"
+    dataset_dict:
+        train: "@train#train_dataset"
+    dataset_keys: 'case_identifier'
+    state_attributes:
+    - "iteration"
+    - "epoch"
+    tag_name: 'Train_Loss'
+    experiment_param: "$src.mlflow.create_mlflow_experiment_params( @bundle_root + '/nnUNet/params.yaml')"
+    #artifacts=None
+    optimizer_param_names: 'lr'
+    #close_on_complete: False
+  - _target_: LrScheduleHandler
+    lr_scheduler: '@lr_scheduler'
+    print_lr: true
+  - _target_: ValidationHandler
+    epoch_level: true
+    interval: '@val_interval'
+    validator: '@validate#evaluator'
+  #- _target_: StatsHandler
+  #  output_transform: $monai.handlers.from_engine(['loss'], first=True)
+  #  tag_name: train_loss
+  - _target_: TensorBoardStatsHandler
+    log_dir: '@log_dir'
+    output_transform: $monai.handlers.from_engine(['loss'], first=True)
+    tag_name: train_loss
+  - _target_: CheckpointLoader
+    load_dict:
+      network_weights: '$@nnunet_trainer.network._orig_mod'
+      optimizer_state: '$@nnunet_trainer.optimizer'
+      scheduler: '$@nnunet_trainer.lr_scheduler'
+    load_path: '$@ckpt_dir+"/checkpoint_epoch="+str(src.trainer.get_checkpoint(@reload_checkpoint_epoch, @ckpt_dir))+".pt"'
+    map_location: '@device'

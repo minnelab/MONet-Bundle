@@ -1,0 +1,218 @@
+bundle_root: .
+checkpoint:
+  inference_allowed_mirroring_axes: $@nnunet_trainer.inference_allowed_mirroring_axes
+  init_args: $@nnunet_trainer.my_init_kwargs
+  trainer_name: $@nnunet_trainer.__class__.__name__
+checkpoint_filename: $@bundle_root+'/models/nnunet_checkpoint.pth'
+ckpt_dir: $@bundle_root + '/models/fold_'+str(@fold_id)
+dataset_name: $nnunetv2.utilities.dataset_name_id_conversion.maybe_convert_to_dataset_name(@dataset_name_or_id)
+dataset_name_or_id: '100'
+device: $@nnunet_trainer.device
+epochs: $@nnunet_trainer.num_epochs
+fold_id: 0
+imports:
+- $import glob
+- $import os
+- $import ignite
+- $import torch
+- $import shutil
+- $import json
+- $import src
+- $import nnunetv2
+- $import src.mlflow
+- $import src.trainer
+- $from pathlib import Path
+initialize:
+- $monai.utils.set_determinism(seed=123)
+iterations: $@nnunet_trainer.num_iterations_per_epoch
+label_dict:
+  0: background
+  1: class1
+log_dir: $@bundle_root + '/logs'
+loss: $@nnunet_trainer.loss
+lr_scheduler: $@nnunet_trainer.lr_scheduler
+mlflow_experiment_name: nnUNet_Bundle
+mlflow_run_name: nnUNet_Bundle
+network: $@nnunet_trainer.network
+nnunet_configuration: 3d_fullres
+nnunet_model_folder: $os.path.join(os.environ['nnUNet_results'], @dataset_name, @nnunet_trainer_class_name+'__'+@nnunet_plans_identifier+'__'+@nnunet_configuration)
+nnunet_plans_identifier: nnUNetPlans
+nnunet_trainer:
+  _target_: get_nnunet_trainer
+  configuration: '@nnunet_configuration'
+  dataset_name_or_id: '@dataset_name_or_id'
+  fold: 0
+  plans_identifier: '@nnunet_plans_identifier'
+  trainer_class_name: '@nnunet_trainer_class_name'
+nnunet_trainer_class_name: nnUNetTrainer
+num_classes: 2
+optimizer: $@nnunet_trainer.optimizer
+run:
+- $torch.save(@checkpoint,@checkpoint_filename)
+- $shutil.copy(Path(@nnunet_model_folder).joinpath('dataset.json'), @bundle_root+'/models/dataset.json')
+- $shutil.copy(Path(@nnunet_model_folder).joinpath('plans.json'), @bundle_root+'/models/plans.json')
+- '$@train#pbar.attach(@train#trainer,output_transform=lambda x: {''loss'': x[0][''loss'']})'
+- $@validate#pbar.attach(@validate#evaluator,metric_names=['Val_Dice'])
+- $@train#trainer.run()
+tracking_uri: http://localhost:5000
+train:
+  dataloader: $@nnunet_trainer.dataloader_train
+  inferer:
+    _target_: SimpleInferer
+  pbar:
+    _target_: ignite.contrib.handlers.tqdm_logger.ProgressBar
+  train_data: $[{'case_identifier':k} for k in @nnunet_trainer.dataloader_train.generator._data.identifiers]
+  train_dataset:
+    _target_: Dataset
+    data: '@train#train_data'
+  trainer:
+    _target_: SupervisedTrainer
+    additional_metrics: '@train_additional_metrics'
+    amp: true
+    device: '@device'
+    epoch_length: '@iterations'
+    inferer: '@train#inferer'
+    key_train_metric: '@train_key_metric'
+    loss_function: '@loss'
+    max_epochs: '@epochs'
+    network: '@network'
+    optimizer: '@optimizer'
+    postprocessing: '@train_postprocessing'
+    prepare_batch: $src.trainer.prepare_nnunet_batch
+    train_data_loader: '@train#dataloader'
+    train_handlers: '@train_handlers#handlers'
+train_additional_metrics:
+  Train_Dice_per_class:
+    _target_: MeanDice
+    include_background: false
+    output_transform: $monai.handlers.from_engine(['pred', 'label'])
+    reduction: mean_batch
+train_handlers:
+  handlers:
+  - _target_: $src.mlflow.MLFlownnUNetHandler
+    dataset_dict:
+      train: '@train#train_dataset'
+    dataset_keys: case_identifier
+    experiment_name: '@mlflow_experiment_name'
+    experiment_param: $src.mlflow.create_mlflow_experiment_params( @bundle_root +
+      '/nnUNet/params.yaml')
+    label_dict: '@label_dict'
+    optimizer_param_names: lr
+    output_transform: $src.mlflow.mlflow_transform
+    run_name: '@mlflow_run_name'
+    state_attributes:
+    - iteration
+    - epoch
+    tag_name: Train_Loss
+    tracking_uri: '@tracking_uri'
+  - _target_: LrScheduleHandler
+    lr_scheduler: '@lr_scheduler'
+    print_lr: true
+  - _target_: ValidationHandler
+    epoch_level: true
+    interval: '@val_interval'
+    validator: '@validate#evaluator'
+  - _target_: TensorBoardStatsHandler
+    log_dir: '@log_dir'
+    output_transform: $monai.handlers.from_engine(['loss'], first=True)
+    tag_name: train_loss
+train_key_metric:
+  Train_Dice:
+    _target_: MeanDice
+    include_background: false
+    output_transform: $monai.handlers.from_engine(['pred', 'label'])
+    reduction: mean
+train_postprocessing:
+  _target_: Compose
+  transforms:
+  - _target_: Lambdad
+    func: '$lambda x: x[0]'
+    keys:
+    - pred
+    - label
+  - _target_: Activationsd
+    keys:
+    - pred
+    softmax: true
+  - _target_: AsDiscreted
+    keys:
+    - pred
+    threshold: 0.5
+  - _target_: AsDiscreted
+    keys:
+    - label
+    to_onehot: '@num_classes'
+train_postprocessing_region_based:
+  _target_: Compose
+  transforms:
+  - _target_: Lambdad
+    func: '$lambda x: x[0]'
+    keys:
+    - pred
+    - label
+  - _target_: Activationsd
+    keys:
+    - pred
+    sigmoid: true
+  - _target_: AsDiscreted
+    keys:
+    - pred
+    threshold: 0.5
+val_additional_metrics:
+  Val_Dice_per_class:
+    _target_: MeanDice
+    include_background: false
+    output_transform: $monai.handlers.from_engine(['pred', 'label'])
+    reduction: mean_batch
+val_handlers:
+  handlers:
+  - _target_: StatsHandler
+    iteration_log: false
+  - _target_: TensorBoardStatsHandler
+    iteration_log: false
+    log_dir: '@log_dir'
+  - _target_: $src.mlflow.MLFlownnUNetHandler
+    experiment_name: '@mlflow_experiment_name'
+    iteration_log: false
+    label_dict: '@label_dict'
+    output_transform: $src.mlflow.mlflow_transform
+    run_name: '@mlflow_run_name'
+    state_attributes:
+    - best_metric
+    - best_metric_epoch
+    tracking_uri: '@tracking_uri'
+  - _target_: CheckpointSaver
+    n_saved: 1
+    save_dict:
+      network_weights: $@nnunet_trainer.network._orig_mod
+      optimizer_state: $@nnunet_trainer.optimizer
+      scheduler: $@nnunet_trainer.lr_scheduler
+    save_dir: '@ckpt_dir'
+    save_interval: 1
+    save_key_metric: true
+val_interval: 1
+val_key_metric:
+  Val_Dice:
+    _target_: MeanDice
+    include_background: false
+    output_transform: $monai.handlers.from_engine(['pred', 'label'])
+    reduction: mean
+validate:
+  dataloader: $@nnunet_trainer.dataloader_val
+  evaluator:
+    _target_: SupervisedEvaluator
+    additional_metrics: '@val_additional_metrics'
+    amp: true
+    device: '@device'
+    epoch_length: $@nnunet_trainer.num_val_iterations_per_epoch
+    inferer: '@validate#inferer'
+    key_val_metric: '@val_key_metric'
+    network: '@network'
+    postprocessing: '@train_postprocessing'
+    prepare_batch: $src.trainer.prepare_nnunet_batch
+    val_data_loader: '@validate#dataloader'
+    val_handlers: '@val_handlers#handlers'
+  inferer:
+    _target_: SimpleInferer
+  pbar:
+    _target_: ignite.contrib.handlers.tqdm_logger.ProgressBar

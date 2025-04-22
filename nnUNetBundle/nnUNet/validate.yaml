@@ -1,0 +1,21 @@
+
+val_interval: 1
+validate:
+  pbar:
+    _target_: "ignite.contrib.handlers.tqdm_logger.ProgressBar"
+  dataloader: $@nnunet_trainer.dataloader_val
+  evaluator:
+    _target_: SupervisedEvaluator
+    additional_metrics: '@val_additional_metrics'
+    amp: true
+    epoch_length: $@nnunet_trainer.num_val_iterations_per_epoch
+    device: '@device'
+    inferer: '@validate#inferer'
+    key_val_metric: '@val_key_metric'
+    network: '@network'
+    postprocessing: '@train_postprocessing'
+    val_data_loader: '@validate#dataloader'
+    val_handlers: '@val_handlers#handlers'
+    prepare_batch: "$src.trainer.prepare_nnunet_batch"
+  inferer:
+    _target_: SimpleInferer

@@ -1,0 +1,16 @@
+
+
+dataset_name_or_id: "100"
+nnunet_trainer_class_name: "nnUNetTrainer"
+nnunet_plans_identifier: "nnUNetPlans"
+nnunet_configuration: "3d_fullres"
+
+num_classes: 2
+label_dict:
+    0: "background"
+    1: "class1"
+    
+tracking_uri: "http://localhost:5000"
+mlflow_experiment_name: "nnUNet_Bundle"
+mlflow_run_name: "nnUNet_Bundle"
+log_dir: "$@bundle_root + '/logs'"

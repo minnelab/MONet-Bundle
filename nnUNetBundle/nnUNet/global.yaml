@@ -1,0 +1,9 @@
+
+iterations: $@nnunet_trainer.num_iterations_per_epoch
+device: $@nnunet_trainer.device
+epochs: $@nnunet_trainer.num_epochs
+
+fold_id: 0
+
+bundle_root: .
+ckpt_dir: "$@bundle_root + '/models/fold_'+str(@fold_id)"
