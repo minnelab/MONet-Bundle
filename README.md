@@ -24,3 +24,22 @@ The converter will first convert the nnUNet model to MONAI Bundle format, and th
 For testing purposes, you can use the `Task09_Spleen.zip` file provided in this repository and the [nnUNet Bundle template](./nnUNetBundle/):
 
 The instructions to run the converter can be found in the [run_conversion.py](run_conversion.py) file.
+
+## Package the MONAI Bundle with MONAI Deploy
+To package the MONAI Bundle with MONAI Deploy, you can use the `monai-deploy package` command. This command will create a deployable bundle that can be used for inference with MONAI Deploy.
+
+```bash
+monai-deploy package examples/apps/spleen_nnunet_seg_app -c examples/apps/spleen_nnunet_seg_appapp.yaml -t spleen:1.0 --platform x86_64
+```
+The resulting Docker context can be found in the `deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0` directory. You can use this context to build a Docker image that can be used for inference with MONAI Deploy:
+```bash
+# Copy the TorchScript model to the Docker context
+cp nnUNetBundle/models/fold_0/model.ts deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0/models/model/
+
+docker build deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0 --build-arg UID=1000 --build-arg GID=1000 --build-arg UNAME=holoscan -f deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0/Dockerfile -t spleen-x64-workstation-dgpu-linux-amd64:1.0
+```
+To test the resulting Docker image, you can run:
+```bash
+python run_inference_nifti.py
+```
+Where `imagesTs` is the input folder, directly from the original Spleen Decathlon Dataset, and `predsTs` is the output folder, where the predictions will be saved. The input folder should contain the images in NIfTI format, and the output folder will contain the predictions in NIfTI format.
