@@ -61,7 +61,7 @@ class MLFlownnUNetHandler(MLFlowHandler):
         for metric in log_dict:
             if type(log_dict[metric]) == torch.Tensor:
                 for i,val in enumerate(log_dict[metric]):
-                    new_log_dict[metric+"_{}".format(list(self.label_dict.keys())[i+1])] = val
+                    new_log_dict[metric+"_{}".format(self.label_dict[list(self.label_dict.keys())[i+1]])] = val
             else:
                 new_log_dict[metric] = log_dict[metric]
         self._log_metrics(new_log_dict, step=current_epoch)

@@ -40,7 +40,7 @@ train_handlers:
     tag_name: train_loss
   - _target_: CheckpointLoader
     load_dict:
-      network_weights: '$@nnunet_trainer.network._orig_mod'
+      network_weights: '$@nnunet_trainer.network'
       optimizer_state: '$@nnunet_trainer.optimizer'
       scheduler: '$@nnunet_trainer.lr_scheduler'
     load_path: '$@ckpt_dir+"/checkpoint_epoch="+str(src.trainer.get_checkpoint(@reload_checkpoint_epoch, @ckpt_dir))+".pt"'

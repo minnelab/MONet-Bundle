@@ -184,7 +184,7 @@ val_handlers:
   - _target_: CheckpointSaver
     n_saved: 1
     save_dict:
-      network_weights: $@nnunet_trainer.network._orig_mod
+      network_weights: $@nnunet_trainer.network
       optimizer_state: $@nnunet_trainer.optimizer
       scheduler: $@nnunet_trainer.lr_scheduler
     save_dir: '@ckpt_dir'
