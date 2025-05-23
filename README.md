@@ -1,6 +1,6 @@
-# nnUNet MONAI Bundle
+# MONet Bundle
 
-This repository contains the implementation of the nnUNet MONAI Bundle, with some instructions on how to use it and how to convert a generic nnUNet model to MONAI Bundle format.
+This repository contains the implementation of the MONet Bundle, with some instructions on how to use it and how to convert a generic nnUNet model to MONAI Bundle format.
 
 For more details about the nnUNet MONAI Bundle, please refer to the Jupyter notebook [nnUNet_Bundle.ipynb](nnUNet_Bundle.ipynb).
 
