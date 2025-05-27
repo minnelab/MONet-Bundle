@@ -1,0 +1,15 @@
+
+dataset_name_or_id: "009"
+nnunet_trainer_class_name: "nnUNetTrainer"
+nnunet_plans_identifier: "nnUNetPlans"
+
+num_classes: 2
+label_dict:
+    0: "background"
+    1: "spleen"
+    
+tracking_uri: "http://localhost:5000"
+mlflow_experiment_name: "MONet_Bundle_Spleen"
+mlflow_run_name: "MONet_Bundle_Spleen"
+
+
