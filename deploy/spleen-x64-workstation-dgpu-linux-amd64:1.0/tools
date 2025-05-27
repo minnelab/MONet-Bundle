@@ -390,12 +390,9 @@ main() {
     else # all other commands will launch the application
         local command=$(jq -r '.command | fromjson | join(" ")' ${HOLOSCAN_APP_MANIFEST_PATH} 2>/dev/null)
         if [ -n "${command}" ]; then
-            files=$(get_list_of_files)
-            for file in $files; do
-                args=$(printf " %s" "${@}")
-                info "Launching application ${command} --input ${file} ${args:1}..."
-                eval ${command} --input "${file}" "$@"
-            done
+            args=$(printf " %s" "${@}")
+            info "Launching application ${command} ${args:1}..."
+            eval ${command} "$@"
             exit_code=$?
             if [ $exit_code -ne 0 ] && [ -f /.dockerenv ] && [ "$HOLOSCAN_HOSTING_SERVICE" != "HOLOSCAN_RUN" ]; then
                 newline
