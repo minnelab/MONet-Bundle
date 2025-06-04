@@ -50,6 +50,11 @@ test_loader:
 
 device: "$torch.device('cuda')"
 
+nnunet_trainer_class_name: nnUNetTrainer
+nnunet_config_ckpt: 
+plans: 
+dataset_json: 
+
 nnunet_config_dict:
   model_folder: "$@bundle_root + '/models/fold_'+str(@fold_id)"
   model_name: "@model_name"

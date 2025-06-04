@@ -4,6 +4,8 @@ This repository contains the implementation of the MONet Bundle, with some instr
 
 For more details about the nnUNet MONAI Bundle, please refer to the Jupyter notebook [nnUNet_Bundle.ipynb](nnUNet_Bundle.ipynb).
 
+## Download the MONet Bundle
+You can download the MONet Bundle from the following link: [MONet Bundle](https://raw.githubusercontent.com/SimoneBendazzoli93/MONet-Bundle/main/MONetBundle.zip)
 
 ## Convert a trained nnUNet model to MONAI Bundle
 
