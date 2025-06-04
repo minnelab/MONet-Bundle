@@ -21,7 +21,7 @@ Next, you can build the provided Docker image to convert the model to MONAI Bund
 docker build -t nnunet-monai-bundle-converter .
 ```
 The converter will first convert the nnUNet model to MONAI Bundle format, and then create the corresponding TorchScript model, which can be used for inference with MONAI Deploy.
-For testing purposes, you can use the `Task09_Spleen.zip` file provided in this repository and the [nnUNet Bundle template](./nnUNetBundle/):
+For testing purposes, you can use the `Task09_Spleen.zip` file provided in this repository and the [MONet Bundle template](./MONetBundle/):
 
 The instructions to run the converter can be found in the [run_conversion.py](run_conversion.py) file.
 
