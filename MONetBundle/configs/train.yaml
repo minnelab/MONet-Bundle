@@ -41,7 +41,7 @@ nnunet_trainer:
   _target_: get_nnunet_trainer
   configuration: '@nnunet_configuration'
   dataset_name_or_id: '@dataset_name_or_id'
-  fold: 0
+  fold: '@fold_id'
   plans_identifier: '@nnunet_plans_identifier'
   trainer_class_name: '@nnunet_trainer_class_name'
 nnunet_trainer_class_name: nnUNetTrainer
@@ -184,7 +184,7 @@ val_handlers:
   - _target_: CheckpointSaver
     n_saved: 1
     save_dict:
-      network_weights: $@nnunet_trainer.network
+      network_weights: $@nnunet_trainer.network._orig_mod
       optimizer_state: $@nnunet_trainer.optimizer
       scheduler: $@nnunet_trainer.lr_scheduler
     save_dir: '@ckpt_dir'
