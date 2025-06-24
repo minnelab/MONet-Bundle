@@ -27,8 +27,8 @@ For testing purposes, you can use the `Task09_Spleen.zip` file provided in this 
 
 The instructions to run the converter can be found in the [run_conversion.py](run_conversion.py) file.
 
-## Package the MONAI Bundle with MONAI Deploy
-To package the MONAI Bundle with MONAI Deploy, you can use the `monai-deploy package` command. This command will create a deployable bundle that can be used for inference with MONAI Deploy.
+## Package the MONet Bundle with MONAI Deploy
+To package the MONet Bundle with MONAI Deploy, you can use the `monai-deploy package` command. This command will create a deployable bundle that can be used for inference with MONAI Deploy.
 
 ```bash
 monai-deploy package examples/apps/spleen_nnunet_seg_app -c examples/apps/spleen_nnunet_seg_appapp.yaml -t spleen:1.0 --platform x86_64
