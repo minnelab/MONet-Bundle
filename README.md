@@ -4,6 +4,12 @@ This repository contains the implementation of the MONet Bundle, with some instr
 
 For more details about the MONet Bundle, please refer to the Jupyter notebook [MONet_Bundle.ipynb](MONet_Bundle.ipynb).
 
+
+## 2025-06-25 UPDATE: Check out the MONet Bundle for FedBraTS and FedLymphoma!
+The MONet Bundle has been used in the Federated Brain Tumor Segmentation [FedBraTS](./Projects/FedBraTS/) and Federated Lymphoma Segmentation [FedLymphoma](./Projects/FedLymphoma/) projects, which are described in the following paper:
+- [MONet-FL: Extending nnU-Net with MONAI for Clinical Federated Learning]()
+
+
 ## Download the MONet Bundle
 You can download the MONet Bundle from the following link: [MONet Bundle](https://raw.githubusercontent.com/SimoneBendazzoli93/MONet-Bundle/main/MONetBundle.zip)
 
