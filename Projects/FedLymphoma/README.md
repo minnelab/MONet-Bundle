@@ -9,7 +9,7 @@ The Federated training is performed following the tutorial [MONet-FL](https://gi
 
 In detail, the 2 Lymphoma datasets used in the study are:
 - [AutoPET](https://zenodo.org/records/10990932)
-- [IndolentLymphoma-KUH], private collection of PET-CT of lymphoma patients and corresponding annotations from Karolinska University Hospital, Stockholm, Sweden
+- IndolentLymphoma-KUH, private collection of PET-CT of lymphoma patients and corresponding annotations from Karolinska University Hospital, Stockholm, Sweden
 
 ![](./images/Dataset.png)
 Each dataset is assigned to a different site, and the federated training is performed using the [MONet bundle](https://github.com/SimoneBendazzoli93/MONet-Bundle).
