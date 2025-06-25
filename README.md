@@ -2,7 +2,7 @@
 
 This repository contains the implementation of the MONet Bundle, with some instructions on how to use it and how to convert a generic nnUNet model to MONAI Bundle format.
 
-For more details about the nnUNet MONAI Bundle, please refer to the Jupyter notebook [nnUNet_Bundle.ipynb](nnUNet_Bundle.ipynb).
+For more details about the MONet Bundle, please refer to the Jupyter notebook [MONet_Bundle.ipynb](MONet_Bundle.ipynb).
 
 ## Download the MONet Bundle
 You can download the MONet Bundle from the following link: [MONet Bundle](https://raw.githubusercontent.com/SimoneBendazzoli93/MONet-Bundle/main/MONetBundle.zip)
@@ -23,7 +23,7 @@ Next, you can build the provided Docker image to convert the model to MONAI Bund
 docker build -t nnunet-monai-bundle-converter .
 ```
 The converter will first convert the nnUNet model to MONAI Bundle format, and then create the corresponding TorchScript model, which can be used for inference with MONAI Deploy.
-For testing purposes, you can use the `Task09_Spleen.zip` file provided in this repository and the [MONet Bundle template](./MONetBundle/):
+For testing purposes, you can use the `Task09_Spleen.zip` file provided in this repository and the [MONet Bundle template](./MONetBundle/).
 
 The instructions to run the converter can be found in the [run_conversion.py](run_conversion.py) file.
 
@@ -33,22 +33,30 @@ To package the MONet Bundle with MONAI Deploy, you can use the `monai-deploy pac
 ```bash
 monai-deploy package examples/apps/spleen_nnunet_seg_app -c examples/apps/spleen_nnunet_seg_appapp.yaml -t spleen:1.0 --platform x86_64
 ```
+
+## Run inference with MONAI Deploy
+
 The resulting Docker context can be found in the `deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0` directory. You can use this context to build a Docker image that can be used for inference with MONAI Deploy:
 ```bash
 # Copy the TorchScript model to the Docker context
 cp nnUNetBundle/models/fold_0/model.ts deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0/models/model/
 
 docker build deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0 --build-arg UID=1000 --build-arg GID=1000 --build-arg UNAME=holoscan -f deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0/Dockerfile -t spleen-x64-workstation-dgpu-linux-amd64:1.0
+```
 
 To test the resulting Docker image, you can run:
 ```bash
 python run_inference_dicom.py
 ```
+Specifying the input and output folders, together with the TorchScript model path.
+The input folder should contain all the DICOM files of the study you want to process, and the output folder will contain the predictions in DICOM SEG format, and an additional STL file with the 3D mesh of the segmentation.
 
 
-To create the same Docker image running inference on NIFTI images, you can use the provided `Dockerfile` in the `deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0.nifti` directory. The Dockerfile is already set up to run inference on NIfTI images, and it includes the necessary dependencies.
+
+To create the same Docker image running inference on NIFTI images, you can use the provided `Dockerfile` in the `deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0-nifti` directory. The Dockerfile is already set up to run inference on NIfTI images, and it includes the necessary dependencies.
 To test the resulting Docker image, you can run:
 ```bash
 python run_inference_nifti.py
 ```
-Where `imagesTs` is the input folder, directly from the original Spleen Decathlon Dataset, and `predsTs` is the output folder, where the predictions will be saved. The input folder should contain the images in NIfTI format, and the output folder will contain the predictions in NIfTI format.
+Specifying the input and output folders, together with the TorchScript model path.
+The input folder should contain all the NIfTI files of the study you want to process (one per modality, with the given suffix identifier), and the output folder will contain the predictions in NIfTI format.
