@@ -29,7 +29,7 @@ The suffix identifiers for the modalities are:
 
 
 ```bash
-docker run --rm -it --gpus=all --shm-size 2Gi -v $INPUT_STUDY_FOLDER:/var/holoscan/input -v $PREDICTIONS_FOLDER:/var/holoscan/output maiacloud/brats-x64-workstation-dgpu-linux-amd64:1.0-nifti
+docker run --rm -it --gpus=all --shm-size 2G -v $INPUT_STUDY_FOLDER:/var/holoscan/input -v $PREDICTIONS_FOLDER:/var/holoscan/output maiacloud/brats-x64-workstation-dgpu-linux-amd64:1.0-nifti
 ```
 
 ### References
