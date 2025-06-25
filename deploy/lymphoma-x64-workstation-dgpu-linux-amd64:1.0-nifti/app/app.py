@@ -79,10 +79,16 @@ class AILymphomaNIFTIMONetSegApp(Application):
         # and algorithm_version are of DICOM VR LO type, limited to 64 chars.
         # https://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html
 
-        output_file = Path(app_output_path).joinpath(Path(app_input_path).name+".nii.gz")
+        id_prefix = ""
+        files = list(Path(app_input_path).glob("*"))
+        self._logger.info(f"Found files in directory {app_input_path}: {files}")
+        for file in files:
+            if file.name.endswith("_ct.nii.gz"):
+                id_prefix = file.name.replace("_ct.nii.gz", "")
+        output_file = Path(app_output_path).joinpath(id_prefix + ".nii.gz")
 
         if Path(output_file).is_file():
-            output_file = Path(app_output_path).joinpath(Path(app_input_path).name+"_seg.nii.gz")
+            output_file = Path(app_output_path).joinpath(id_prefix + "_seg.nii.gz")
 
         nifti_seg_writer = NiftiDataWriter(
             self,
