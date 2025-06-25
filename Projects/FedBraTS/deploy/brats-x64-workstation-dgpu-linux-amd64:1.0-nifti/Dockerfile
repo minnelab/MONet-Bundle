@@ -146,5 +146,4 @@ COPY ./map/pkg.json /etc/holoscan/pkg.json
 
 COPY ./app /opt/holoscan/app
 
-
 ENTRYPOINT ["/var/holoscan/tools"]
