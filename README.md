@@ -39,7 +39,14 @@ The resulting Docker context can be found in the `deploy/spleen-x64-workstation-
 cp nnUNetBundle/models/fold_0/model.ts deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0/models/model/
 
 docker build deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0 --build-arg UID=1000 --build-arg GID=1000 --build-arg UNAME=holoscan -f deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0/Dockerfile -t spleen-x64-workstation-dgpu-linux-amd64:1.0
+
+To test the resulting Docker image, you can run:
+```bash
+python run_inference_dicom.py
 ```
+
+
+To create the same Docker image running inference on NIFTI images, you can use the provided `Dockerfile` in the `deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0.nifti` directory. The Dockerfile is already set up to run inference on NIfTI images, and it includes the necessary dependencies.
 To test the resulting Docker image, you can run:
 ```bash
 python run_inference_nifti.py
