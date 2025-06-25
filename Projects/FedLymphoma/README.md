@@ -1,4 +1,4 @@
-# Federated Lymphoma (FedLymphoma)
+# Federated Lymphoma Segmentation (FedLymphoma)
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/maiacloud/lymphoma-x64-workstation-dgpu-linux-amd64)](https://hub.docker.com/r/maiacloud/lymphoma-x64-workstation-dgpu-linux-amd64)
 
