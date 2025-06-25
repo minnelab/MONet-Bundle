@@ -136,7 +136,7 @@ RUN pip install --no-cache-dir --user -r /tmp/requirements.txt
 
 # Install MONAI Deploy from PyPI org
 # RUN pip install monai-deploy-app-sdk==1.0.0
-RUN pip install git+https://github.com/SimoneBendazzoli93/monai-deploy-app-sdk.git
+RUN pip install git+https://github.com/SimoneBendazzoli93/monai-deploy-app-sdk.git@d38d519d8c0b40a4f72207e5e839f444ab4d8712
 
 
 
