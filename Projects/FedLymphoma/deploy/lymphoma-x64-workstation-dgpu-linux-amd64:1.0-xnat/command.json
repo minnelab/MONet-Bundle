@@ -5,7 +5,7 @@
     "version": "1.0",
     "schema-version": "1.0",
     "info-url": "https://github.com/rordenlab/dcm2niix",
-    "image": "maiacloud/lymphoma-x64-workstation-dgpu-linux-amd64:1.0-xnat",
+    "image": "maiacloud/lymphoma-x64-workstation-dgpu-linux-amd64:1.1-xnat",
     "type": "docker",
     "command-line": "",
     "mounts": [

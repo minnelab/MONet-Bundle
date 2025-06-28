@@ -73,6 +73,7 @@ class AILymphomaMONetSegApp(Application):
             output_mapping=[IOMapping("pred", Image, IOType.IN_MEMORY)],
             app_context=app_context,
             bundle_config_names=config_names,
+            ref_modality="PT",  # Use the PET modality as the reference for segmentation
             name="monet_bundle_lymphoma_seg_op",
         )
 
@@ -111,7 +112,7 @@ class AILymphomaMONetSegApp(Application):
         self.add_flow(PT_series_to_vol_op, bundle_lymphoma_seg_op, {("image", "PT")})
         # Note below the dicom_seg_writer requires two inputs, each coming from a source operator.
         self.add_flow(
-            CT_series_selector_op, dicom_seg_writer, {("study_selected_series_list", "study_selected_series_list")}
+            PT_series_selector_op, dicom_seg_writer, {("study_selected_series_list", "study_selected_series_list")}
         )
         self.add_flow(bundle_lymphoma_seg_op, dicom_seg_writer, {("pred", "seg_image")})
 
