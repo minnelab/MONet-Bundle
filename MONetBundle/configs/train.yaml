@@ -1,4 +1,17 @@
 bundle_root: .
+displayable_configs:
+  dataset_name_or_id: '@dataset_name_or_id'
+  fold_id: '@fold_id'
+  mlflow_run_name: '@mlflow_run_name'
+  nnunet_configuration: '@nnunet_configuration'
+  nnunet_plans_identifier: '@nnunet_plans_identifier'
+  nnunet_trainer_class_name: '@nnunet_trainer_class_name'
+  num_classes: '@num_classes'
+  region_class_order: ''
+  tracking_experiment_name: '@mlflow_experiment_name'
+  tracking_uri: '@tracking_uri'
+  modality_list: 'CT'
+  Label_0: '@label_dict.0'
 checkpoint:
   inference_allowed_mirroring_axes: $@nnunet_trainer.inference_allowed_mirroring_axes
   init_args: $@nnunet_trainer.my_init_kwargs
