@@ -71,6 +71,7 @@ class AILymphomaNIFTIMONetSegApp(Application):
             output_mapping=[IOMapping("pred", Image, IOType.IN_MEMORY)],
             app_context=app_context,
             bundle_config_names=config_names,
+            ref_modality="PT",  # Use the PET modality as the reference for segmentation
             name="nnunet_bundle_spleen_seg_op",
         )
 
