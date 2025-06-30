@@ -175,6 +175,29 @@ To run the inference on a study stored in XNAT, using the [XNAT Container Servic
   The additional environment variable `ORTHANC_URL` should be set to the URL of the Orthanc server where to send the DICOM SEG files produced by the inference.
 
 
+## Results
+
+| **Dataset - Label**        | **Experiment**       | **DSC**            | **ASD [mm]**         |
+|---------------------------|----------------------|--------------------|----------------------|
+| **AutoPET (n=27) - Lesion** | Cross-Site IL1        | 0.445 ± 0.270       | 50.19 ± 95.19        |
+|                           | Cross-Site IL2        | 0.587 ± 0.251       | 40.06 ± 89.72        |
+|                           | *MONet-FL*            | *0.694 ± 0.279*     | *10.80 ± 24.61*      |
+|                           | LymphoFusion          | 0.756 ± 0.244       | 19.27 ± 39.78        |
+|                           | nnU-Net-Baseline      | 0.758 ± 0.252       | 38.50 ± 133.01       |
+| **IL1 (n=16) - Lesion**     | Cross-Site AutoPET    | 0.317 ± 0.255       | 99.46 ± 147.08       |
+|                           | Cross-Site IL2        | 0.297 ± 0.230       | 111.11 ± 172.99      |
+|                           | *MONet-FL*            | *0.453 ± 0.252*     | *70.91 ± 127.18*     |
+|                           | LymphoFusion          | 0.421 ± 0.223       | 90.29 ± 143.43       |
+|                           | nnU-Net-Baseline      | 0.512 ± 0.215       | 12.95 ± 11.69        |
+| **IL2 (n=31) - Lesion**     | Cross-Site AutoPET    | 0.534 ± 0.265       | 39.34 ± 71.36        |
+|                           | Cross-Site IL1        | 0.391 ± 0.247       | 40.03 ± 79.63        |
+|                           | *MONet-FL*            | *0.610 ± 0.234*     | *25.03 ± 64.44*      |
+|                           | LymphoFusion          | 0.665 ± 0.242       | 23.07 ± 70.48        |
+|                           | nnU-Net-Baseline      | 0.671 ± 0.275       | 24.09 ± 72.41        |
+
+**Table 1: Dice Similarity Coefficient (DSC) and Average Surface Distance (ASD) for each Lymphoma experiment across the three datasets (over the validation set): AutoPET, Indolent Lymphoma 1 (IL1) and Indolent Lymphoma 2 (IL2).**
+
+
 ### References
 
     [1] Ingrisch, M., Dexl, J., Jeblick, K., Cyran, C., Gatidis, S., & Kuestner, T. (2024). Automated Lesion Segmentation in Whole-Body PET/CT - Multitracer Multicenter generalization. 27th International Conference on Medical Image Computing and Computer Assisted Intervention (MICCAI 2024). Zenodo. https://doi.org/10.5281/zenodo.10990932
