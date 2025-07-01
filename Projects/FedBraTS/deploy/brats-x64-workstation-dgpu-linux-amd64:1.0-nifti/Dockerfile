@@ -136,9 +136,9 @@ RUN pip install --no-cache-dir --user -r /tmp/requirements.txt
 
 # Install MONAI Deploy from PyPI org
 # RUN pip install monai-deploy-app-sdk==1.0.0
-RUN pip install git+https://github.com/SimoneBendazzoli93/monai-deploy-app-sdk.git@9ab95214bfc2861bbaf49d84b8b11ea8ba999cda
+RUN pip install git+https://github.com/SimoneBendazzoli93/monai-deploy-app-sdk.git@75af6f32c10c37c849e32d2c55ff8845699da1a1
 
-
+COPY ./models  /opt/holoscan/models
 
 COPY ./map/app.json /etc/holoscan/app.json
 COPY ./app.config /var/holoscan/app.yaml
