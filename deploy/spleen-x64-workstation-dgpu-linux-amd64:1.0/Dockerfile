@@ -59,7 +59,7 @@ RUN mkdir -p /etc/holoscan/ \
 
 LABEL base="nvcr.io/nvidia/cuda:12.6.0-runtime-ubuntu22.04"
 LABEL tag="spleen:1.0"
-LABEL org.opencontainers.image.title="MONAI Deploy App Package - Spleen NIFTI nnUNet Seg Inference"
+LABEL org.opencontainers.image.title="MONAI Deploy App Package - Spleen nnUNet Seg Inference"
 LABEL org.opencontainers.image.version="1.0"
 LABEL org.nvidia.holoscan="3.1.0"
 
