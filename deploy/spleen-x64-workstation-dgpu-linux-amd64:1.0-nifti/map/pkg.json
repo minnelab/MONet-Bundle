@@ -1,0 +1,1 @@
+{"apiVersion": "1.0.0", "applicationRoot": "/opt/holoscan/app", "modelRoot": "/opt/holoscan/models", "models": {"model": "/opt/holoscan/models/model"}, "resources": {"cpu": 1, "gpu": 1, "memory": "1Gi", "gpuMemory": "7Gi"}, "version": 1.0, "platformConfig": "dgpu"}
