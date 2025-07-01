@@ -20,7 +20,7 @@ The input folder should contain all the DICOM files of the study you want to pro
 
 
 ```bash
-docker run --rm -it --gpus=all --shm-size 2G -v $INPUT_STUDY_FOLDER:/var/holoscan/input -v $PREDICTIONS_FOLDER:/var/holoscan/output maiacloud/lymphoma-x64-workstation-dgpu-linux-amd64:1.0
+docker run --rm -it --gpus=all --shm-size 2G -v $INPUT_STUDY_FOLDER:/var/holoscan/input -v $PREDICTIONS_FOLDER:/var/holoscan/output maiacloud/lymphoma-x64-workstation-dgpu-linux-amd64:1.1
 ```
 
 ## FedLymphoma Inference on PET-CT [NIFTI Version]
@@ -32,7 +32,7 @@ The suffix identifiers for the modalities are:
 
 
 ```bash
-docker run --rm -it --gpus=all --shm-size 2G -v $INPUT_STUDY_FOLDER:/var/holoscan/input -v $PREDICTIONS_FOLDER:/var/holoscan/output maiacloud/lymphoma-x64-workstation-dgpu-linux-amd64:1.0-nifti
+docker run --rm -it --gpus=all --shm-size 2G -v $INPUT_STUDY_FOLDER:/var/holoscan/input -v $PREDICTIONS_FOLDER:/var/holoscan/output maiacloud/lymphoma-x64-workstation-dgpu-linux-amd64:1.1-nifti
 ```
 
 ## FedLymphoma Inference on PET-CT [XNAT Integration]
@@ -43,10 +43,10 @@ To run the inference on a study stored in XNAT, using the [XNAT Container Servic
     "name": "lymphoma-segmentation",
     "label": "lymphoma-segmentation",
     "description": "Runs Lymphoma Segmentation on a session derived PET-CT scan.",
-    "version": "1.0",
+    "version": "1.1",
     "schema-version": "1.0",
     "info-url": "https://github.com/rordenlab/dcm2niix",
-    "image": "maiacloud/lymphoma-x64-workstation-dgpu-linux-amd64:1.0-xnat",
+    "image": "maiacloud/lymphoma-x64-workstation-dgpu-linux-amd64:1.1-xnat",
     "type": "docker",
     "command-line": "",
     "mounts": [
