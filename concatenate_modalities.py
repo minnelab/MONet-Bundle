@@ -122,7 +122,7 @@ def main():
     resample = SpatialResample(mode="bilinear")
     concatenate = ConcatItemsd(keys=list(modality_mapping.keys()), name="image")
     ref_modality = args.ref_modality
-    formatter = NIFTINameFormatter(modality_mapping[ref_modality])
+    formatter = NIFTINameFormatter(modality_mapping[list(modality_mapping.keys())[0]])
     save = SaveImage(output_dir=output_folder, output_name_formatter=formatter, output_postfix="image",separate_folder=False)
     
     for subfolder in Path(input_folder).iterdir():
