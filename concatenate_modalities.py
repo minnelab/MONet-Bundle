@@ -133,9 +133,17 @@ def main():
                 data[modality] = load(file_path)
             for modality in modality_mapping.keys():
                 if modality != ref_modality:
-                    source_affine_4x4 = define_affine_from_meta(data[modality].meta)
-                    target_affine_4x4 = define_affine_from_meta(data[ref_modality].meta)
-                    data[modality].meta["affine"] = torch.Tensor(source_affine_4x4)
+                    try:
+                        source_affine_4x4 = define_affine_from_meta(data[modality].meta)
+                        data[modality].meta["affine"] = torch.Tensor(source_affine_4x4)
+                    except KeyError:
+                        source_affine_4x4 = data[modality].meta["affine"]
+                        
+                    try:
+                        target_affine_4x4 = define_affine_from_meta(data[ref_modality].meta)
+                    except KeyError:
+                        target_affine_4x4 = data[ref_modality].meta["affine"]
+                    
                     data[modality].meta["pixdim"] = data[ref_modality].meta["pixdim"]
                     data[modality] = resample(data[modality], dst_affine=target_affine_4x4, spatial_size=data[ref_modality].shape[1:],)
             data = concatenate(data)["image"]
