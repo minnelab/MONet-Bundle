@@ -1,0 +1,124 @@
+name: Publish Release
+on:
+  push:
+    tags:
+      - 'v*'
+permissions:
+  contents: write
+
+jobs:
+  build-test-pypi:
+    name: Build, Test and publish Python 🐍 distributions 📦 to Test PyPI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install setuptools
+        run: |
+          python -m pip install --user --upgrade setuptools wheel
+      - name: Build and test source archive and wheel file
+        run: |
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+          root_dir=$PWD
+          echo "$root_dir"
+          set -e
+          python -m pip install numpy
+          python -m pip install -r requirements.txt
+          
+          # build tar.gz and wheel
+          python setup.py sdist bdist_wheel --build-number $(date +'%Y%m%d%H%M')
+          tmp_dir=$(mktemp -d)
+          cp dist/monet_bundle* "$tmp_dir"
+          cd "$tmp_dir"
+          ls -al
+          
+          
+          # install from tar.gz
+          python -m pip install monet_bundle*.tar.gz
+          # python -c 'import MONet; print(MONet.__version__) ' 2>&1 | grep -iv "unknown"
+          # python -c 'import MONet; print(MONet.__file__)'
+          python -m pip uninstall -y monet-bundle
+          rm monet_bundle*.tar.gz
+          
+          # install from wheel
+          python -m pip install monet_bundle*.whl
+          # python -c 'import MONet; print(MONet.__version__) ' 2>&1 | grep -iv "unknown"
+          # python -c 'import MONet; print(MONet.__file__)'
+          
+          # clean up
+          cd "$root_dir"
+          rm -r "$tmp_dir"
+          rm -rf MONet/
+          ls -al .
+      - name: Quick test installed
+        run: |
+          python -m pip install -r requirements.txt
+                # python -m tests.min_tests
+        env:
+          QUICKTEST: True
+
+      - if: startsWith(github.ref, 'refs/tags/')
+        name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - if: startsWith(github.ref, 'refs/tags/')
+        name: Check artifacts
+        run: |
+          ls -al dist/
+          rm dist/monet_bundle*.tar.gz
+          ls -al dist/
+
+      - if: startsWith(github.ref, 'refs/tags/')
+        name: Publish to Test PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          repository-url: https://test.pypi.org/legacy/
+          verbose: true
+      
+      
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          generate_release_notes: True
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+  publish-pypi:
+    name: Publish Python 🐍 distributions 📦 to PyPI
+    needs: build-test-pypi
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+      - name: Install pypa/build
+        run: >-
+          python3 -m
+          pip install
+          build
+          --user
+      - name: Build a binary wheel and a Source
+        run: >-
+          python3 -m
+          build
+          --sdist
+          --wheel
+          --outdir dist/
+      - name: Publish distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
