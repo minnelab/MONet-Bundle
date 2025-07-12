@@ -5,7 +5,7 @@
 [![Documentation Status](https://readthedocs.org/projects/monet-bundle/badge/?version=latest)](https://monet-bundle.readthedocs.io/en/latest/?badge=latest)
 ![Version](https://img.shields.io/badge/MONet-v1.0-blue)
 [![License](https://img.shields.io/badge/license-GPL%203.0-green.svg)](https://opensource.org/licenses/GPL-3.0)
-![Python](https://img.shields.io/badge/python-3.8+-orange)
+![Python](https://img.shields.io/badge/python-3.10+-orange)
 
 
 ![GitHub Release Date - Published_At](https://img.shields.io/github/release-date/SimoneBendazzoli93/MONet-Bundle?logo=github)
@@ -87,7 +87,7 @@ docker build deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0 --build-arg UID=
 
 To test the resulting Docker image, you can run:
 ```bash
-MONet_inference_dicom.py
+MONet_inference_dicom.py --dicom_study_folder <INPUT_FOLDER> --prediction_output_folder <OUTPUT_DIR> --docker-image maiacloud/spleen-x64-workstation-dgpu-linux-amd64:1.0
 ```
 Specifying the input and output folders, together with the TorchScript model path.
 The input folder should contain all the DICOM files of the study you want to process, and the output folder will contain the predictions in DICOM SEG format, and an additional STL file with the 3D mesh of the segmentation.
@@ -97,7 +97,7 @@ The input folder should contain all the DICOM files of the study you want to pro
 To create the same Docker image running inference on NIFTI images, you can use the provided `Dockerfile` in the `deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0-nifti` directory. The Dockerfile is already set up to run inference on NIfTI images, and it includes the necessary dependencies.
 To test the resulting Docker image, you can run:
 ```bash
-MONet_inference_nifti.py
+MONet_inference_nifti.py --study_folder <INPUT_FOLDER> --prediction_output_folder <OUTPUT_DIR> --docker-image maiacloud/spleen-x64-workstation-dgpu-linux-amd64:1.0-nifti
 ```
 Specifying the input and output folders, together with the TorchScript model path.
 The input folder should contain all the NIfTI files of the study you want to process (one per modality, with the given suffix identifier), and the output folder will contain the predictions in NIfTI format.
