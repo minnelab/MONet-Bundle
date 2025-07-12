@@ -1,10 +1,22 @@
 #!/usr/bin/env python
 
 from pathlib import Path
-from monai.transforms import SpatialResample, ConcatItemsd, LoadImage, SaveImage, EnsureChannelFirst, Compose
-import monai
-import numpy as np
-import torch
+try:
+    from monai.transforms import SpatialResample, ConcatItemsd, LoadImage, SaveImage, EnsureChannelFirst, Compose
+    import monai
+except ImportError:
+    SpatialResample = ConcatItemsd = LoadImage = SaveImage = EnsureChannelFirst = Compose = None
+    monai = None
+
+try:
+    import numpy as np
+except ImportError:
+    np = None
+
+try:
+    import torch
+except ImportError:
+    torch = None
 from typing import Dict, Any
 
 

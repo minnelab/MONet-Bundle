@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
-from monai.apps.nnunet.nnunet_bundle import convert_nnunet_to_monai_bundle
+try:
+    from monai.apps.nnunet.nnunet_bundle import convert_nnunet_to_monai_bundle
+except ImportError:
+    convert_nnunet_to_monai_bundle = None
 
 
 def main(dataset_name_or_id: str, bundle_root: str, fold: int):    
@@ -15,7 +18,7 @@ def main(dataset_name_or_id: str, bundle_root: str, fold: int):
     )
 
 
-def parse_args():
+def get_arg_parser():
     import argparse
 
     parser = argparse.ArgumentParser(description="Convert nnUNet checkpoint to MONAI Bundle checkpoint")
@@ -37,12 +40,14 @@ def parse_args():
         default=0,
         help="Fold number for the dataset",
     )
-    return parser.parse_args()
+    return parser
 
-
-if __name__ == "__main__":
-    args = parse_args()
+def main():
+    args = get_arg_parser().parse_args()
     dataset_name_or_id = args.dataset_name_or_id
     bundle_root = args.bundle_root
     fold = args.fold
     main(dataset_name_or_id, bundle_root, fold)
+
+if __name__ == "__main__":
+    main()

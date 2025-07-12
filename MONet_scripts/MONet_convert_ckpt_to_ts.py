@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
-from monai.bundle.scripts import ckpt_export
+try:
+    from monai.bundle.scripts import ckpt_export
+except ImportError:
+    ckpt_export = None
 from pathlib import Path
 import yaml
 import json
@@ -49,7 +52,7 @@ def export(bundle_root, checkpoint_name, nnunet_trainer_name="nnUNetTrainer", fo
     )
 
 
-def parse_args():
+def get_arg_parser():
     import argparse
     parser = argparse.ArgumentParser(description="Convert nnUNet checkpoint to TorchScript")
     parser.add_argument("--bundle_root", type=str, required=True, help="Path to the nnUNet bundle root")
@@ -63,13 +66,15 @@ def parse_args():
         default="00",
         help="Dataset name or ID to convert",
     )
-    return parser.parse_args()
+    return parser
 
-
-if __name__ == "__main__":
-    args = parse_args()
+def main():
+    args = get_arg_parser().parse_args()
     bundle_root = args.bundle_root
     checkpoint_name = args.checkpoint_name
     nnunet_trainer_name = args.nnunet_trainer_name
     fold = args.fold
     export(bundle_root=bundle_root, checkpoint_name=checkpoint_name, nnunet_trainer_name=nnunet_trainer_name, fold=fold)
+
+if __name__ == "__main__":
+    main()
