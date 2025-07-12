@@ -4,8 +4,8 @@ import json
 import os
 from datetime import datetime
 
-import jwt
 import requests
+from jwt import decode
 
 
 def get_token(username: str, password: str) -> str:
@@ -73,9 +73,9 @@ def verify_valid_token_exists(username: str) -> bool:
         return False
 
     try:
-        jwt.decode(token, options={"verify_signature": False})
+        decode(token, options={"verify_signature": False})
         print(f"Token for {username} is valid.")
-        expiration = jwt.decode(token, options={"verify_signature": False}).get("exp")
+        expiration = decode(token, options={"verify_signature": False}).get("exp")
         if expiration:
             expires_at = datetime.utcfromtimestamp(expiration).strftime("%Y-%m-%d %H:%M:%S UTC")
             print(f"Token expires at: {expires_at}")
@@ -102,7 +102,7 @@ def welcome_message(token: str) -> str:
     str
         A welcome message containing the preferred username from the token, or 'User' if not present.
     """
-    decoded_token = jwt.decode(token, options={"verify_signature": False})
+    decoded_token = decode(token, options={"verify_signature": False})
     expiration = decoded_token.get("exp")
     if expiration:
         expires_at = datetime.utcfromtimestamp(expiration).strftime("%Y-%m-%d %H:%M:%S UTC")
