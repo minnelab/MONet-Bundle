@@ -1,5 +1,28 @@
 # MONet Bundle
 
+[![Build](https://github.com/SimoneBendazzoli93/MONet-Bundle/actions/workflows/build.yaml/badge.svg)](https://github.com/SimoneBendazzoli93/MONet-Bundle/actions/workflows/build.yaml)
+
+[![Documentation Status](https://readthedocs.org/projects/monet-bundle/badge/?version=latest)](https://monet-bundle.readthedocs.io/en/latest/?badge=latest)
+![Version](https://img.shields.io/badge/MONet-v1.0-blue)
+[![License](https://img.shields.io/badge/license-GPL%203.0-green.svg)](https://opensource.org/licenses/GPL-3.0)
+![Python](https://img.shields.io/badge/python-3.8+-orange)
+
+
+![GitHub Release Date - Published_At](https://img.shields.io/github/release-date/SimoneBendazzoli93/MONet-Bundle?logo=github)
+![GitHub contributors](https://img.shields.io/github/contributors/SimoneBendazzoli93/MONet-Bundle?logo=github)
+![GitHub top language](https://img.shields.io/github/languages/top/SimoneBendazzoli93/MONet-Bundle?logo=github)
+![GitHub language count](https://img.shields.io/github/languages/count/SimoneBendazzoli93/MONet-Bundle?logo=github)
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/SimoneBendazzoli93/MONet-Bundle/publish_release.yaml?logo=github)
+![GitHub all releases](https://img.shields.io/github/downloads/SimoneBendazzoli93/MONet-Bundle/total?logo=github)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/monet-bundle?logo=pypi)
+![GitHub](https://img.shields.io/github/license/SimoneBendazzoli93/MONet-Bundle?logo=github)
+![PyPI - License](https://img.shields.io/pypi/l/monet-bundle?logo=pypi)
+
+
+![GitHub repo size](https://img.shields.io/github/repo-size/SimoneBendazzoli93/MONet-Bundle?logo=github)
+![GitHub release (with filter)](https://img.shields.io/github/v/release/SimoneBendazzoli93/MONet-Bundle?logo=github)
+![PyPI](https://img.shields.io/pypi/v/monet-bundle?logo=pypi)
+
 This repository contains the implementation of the MONet Bundle, with some instructions on how to use it and how to convert a generic nnUNet model to MONAI Bundle format.
 
 For more details about the MONet Bundle, please refer to the Jupyter notebook [MONet_Bundle.ipynb](./MONet_Bundle.ipynb).
