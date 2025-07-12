@@ -6,10 +6,10 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 WORKDIR /workspace
-COPY convert_nnunet_checkpoint_to_bundle_checkpoint.py .
+COPY MONet_scripts/convert_nnunet_checkpoint_to_bundle_checkpoint.py .
 RUN chmod +x convert_nnunet_checkpoint_to_bundle_checkpoint.py
 
-COPY convert_ckpt_to_ts.py .
+COPY MONet_scripts/convert_ckpt_to_ts.py .
 RUN chmod +x convert_ckpt_to_ts.py
 COPY run.sh .
 

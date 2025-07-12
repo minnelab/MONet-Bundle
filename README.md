@@ -2,16 +2,24 @@
 
 This repository contains the implementation of the MONet Bundle, with some instructions on how to use it and how to convert a generic nnUNet model to MONAI Bundle format.
 
-For more details about the MONet Bundle, please refer to the Jupyter notebook [MONet_Bundle.ipynb](MONet_Bundle.ipynb).
+For more details about the MONet Bundle, please refer to the Jupyter notebook [MONet_Bundle.ipynb](./MONet_Bundle.ipynb).
 
 
 ## 2025-06-25 UPDATE: Check out the MONet Bundle for FedBraTS and FedLymphoma!
-The MONet Bundle has been used in the Federated Brain Tumor Segmentation [FedBraTS](./Projects/FedBraTS/) and Federated Lymphoma Segmentation [FedLymphoma](./Projects/FedLymphoma/) projects, which are described in the following paper:
+The MONet Bundle has been used in the Federated Brain Tumor Segmentation [FedBraTS](./Projects/FedBraTS/README.md) and Federated Lymphoma Segmentation [FedLymphoma](./Projects/FedLymphoma/README.md) projects, which are described in the following paper:
 - [MONet-FL: Extending nnU-Net with MONAI for Clinical Federated Learning]()
 
 
 ## Download the MONet Bundle
 You can download the MONet Bundle from the following link: [MONet Bundle](https://raw.githubusercontent.com/SimoneBendazzoli93/MONet-Bundle/main/MONetBundle.zip)
+ALternatively, you can use the following command to download the MONet Bundle:
+```bash
+wget https://raw.githubusercontent.com/SimoneBendazzoli93/MONet-Bundle/main/MONetBundle.zip
+```
+or, through the Python Script:
+```bash
+MONet_fetch_bundle.py --bundle_path <FOLDER_PATH>
+``` 
 
 ## Convert a trained nnUNet model to MONAI Bundle
 
@@ -29,15 +37,19 @@ Next, you can build the provided Docker image to convert the model to MONAI Bund
 docker build -t nnunet-monai-bundle-converter .
 ```
 The converter will first convert the nnUNet model to MONAI Bundle format, and then create the corresponding TorchScript model, which can be used for inference with MONAI Deploy.
-For testing purposes, you can use the `Task09_Spleen.zip` file provided in this repository and the [MONet Bundle template](./MONetBundle/).
+For testing purposes, you can use the `Task09_Spleen.zip` file provided in this repository.
 
-The instructions to run the converter can be found in the [run_conversion.py](run_conversion.py) file.
+To run the conversion, you can use the following command:
+```bash
+wget https://github.com/SimoneBendazzoli93/MONet-Bundle/releases/download/v1.0/Task09_Spleen.zip
+python MONet_run_conversion.py --bundle_path <MONAI_BUNDLE_PATH> --nnunet_model <NNUNET_CHECKPOINT_PATH>.zip
+```
 
 ## Package the MONet Bundle with MONAI Deploy
 To package the MONet Bundle with MONAI Deploy, you can use the `monai-deploy package` command. This command will create a deployable bundle that can be used for inference with MONAI Deploy.
 
 ```bash
-monai-deploy package examples/apps/spleen_nnunet_seg_app -c examples/apps/spleen_nnunet_seg_appapp.yaml -t spleen:1.0 --platform x86_64
+monai-deploy package examples/apps/spleen_nnunet_seg_app -c examples/apps/spleen_nnunet_seg_app.yaml -t spleen:1.0 --platform x86_64
 ```
 
 ## Run inference with MONAI Deploy
@@ -52,7 +64,7 @@ docker build deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0 --build-arg UID=
 
 To test the resulting Docker image, you can run:
 ```bash
-python run_inference_dicom.py
+MONet_inference_dicom.py
 ```
 Specifying the input and output folders, together with the TorchScript model path.
 The input folder should contain all the DICOM files of the study you want to process, and the output folder will contain the predictions in DICOM SEG format, and an additional STL file with the 3D mesh of the segmentation.
@@ -62,7 +74,7 @@ The input folder should contain all the DICOM files of the study you want to pro
 To create the same Docker image running inference on NIFTI images, you can use the provided `Dockerfile` in the `deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0-nifti` directory. The Dockerfile is already set up to run inference on NIfTI images, and it includes the necessary dependencies.
 To test the resulting Docker image, you can run:
 ```bash
-python run_inference_nifti.py
+MONet_inference_nifti.py
 ```
 Specifying the input and output folders, together with the TorchScript model path.
 The input folder should contain all the NIfTI files of the study you want to process (one per modality, with the given suffix identifier), and the output folder will contain the predictions in NIfTI format.
