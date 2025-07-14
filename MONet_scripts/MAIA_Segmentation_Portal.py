@@ -96,7 +96,7 @@ class MAIAInferenceApp(QWidget):
         logo_label.setAlignment(Qt.AlignCenter)
         
         with importlib.resources.path("MONet.icons", "logo.svg") as icon_path:
-            logo_label.setPixmap(QIcon(icon_path).pixmap(120, 120))
+            logo_label.setPixmap(QIcon(str(icon_path)).pixmap(120, 120))
             
         logo_label.setCursor(Qt.PointingHandCursor)
         def open_maia_website(event):
@@ -149,7 +149,7 @@ class MAIAInferenceApp(QWidget):
         home_button = QPushButton("")
         home_button.setFixedSize(40, 40)
         with importlib.resources.path("MONet.icons", "Home-icon.svg.png") as icon_path:
-            home_button.setIcon(QIcon(icon_path))  # or .png
+            home_button.setIcon(QIcon(str(icon_path)))  # or .png
         home_button.setIconSize(home_button.size())
         home_button.setToolTip("Home")
         # Alternatively, use a local icon file:
@@ -259,6 +259,7 @@ def main():
     window = MAIAInferenceApp()
     with importlib.resources.path("MONet.icons", "logo.svg") as icon_path:
         app.setWindowIcon(QIcon(str(icon_path)))
+        window.setWindowIcon(QIcon(str(icon_path)))
     window.show()
     sys.exit(app.exec_())
 
