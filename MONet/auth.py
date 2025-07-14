@@ -109,7 +109,7 @@ def welcome_message(token: str) -> str:
     decoded_token = decode(token, options={"verify_signature": False})
     expiration = decoded_token.get("exp")
     if expiration:
-        expires_at = datetime.utcfromtimestamp(expiration).strftime("%Y-%m-%d %H:%M:%S UTC")
+        expires_at = datetime.datetime.utcfromtimestamp(expiration).strftime("%Y-%m-%d %H:%M:%S UTC")
         print(f"Token expires at: {expires_at}")
 
     return f"Welcome {decoded_token.get('preferred_username', 'User')}!"

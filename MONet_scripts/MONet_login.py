@@ -6,6 +6,7 @@ import getpass
 import json
 import os
 
+from pathlib import Path
 import requests
 
 from MONet.auth import get_token, verify_valid_token_exists, welcome_message
@@ -79,10 +80,8 @@ def main():
             response = get_token(args.username, args.password)
             token = response.get("access_token")
             home = os.path.expanduser("~")
+            Path(home, ".monet").mkdir(parents=True, exist_ok=True)
             auth_path = os.path.join(home, ".monet", f"{args.username}_auth.json")
-            auth_dir = os.path.dirname(auth_path)
-            if not os.path.exists(auth_dir):
-                os.makedirs(auth_dir, exist_ok=True)
             with open(auth_path, "w") as token_file:
                 json.dump(response, token_file)
             print("\n")
