@@ -4,3 +4,4 @@ git+https://github.com/SimoneBendazzoli93/MONAI.git@dev
 nvflare
 PyJWT
 python-on-whales
+SimpleITK

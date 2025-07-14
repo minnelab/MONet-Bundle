@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import datetime
-
+import datetime
+import jwt
 import requests
 from jwt import decode
 
@@ -77,8 +77,12 @@ def verify_valid_token_exists(username: str) -> bool:
         print(f"Token for {username} is valid.")
         expiration = decode(token, options={"verify_signature": False}).get("exp")
         if expiration:
-            expires_at = datetime.utcfromtimestamp(expiration).strftime("%Y-%m-%d %H:%M:%S UTC")
+            expires_at = datetime.datetime.fromtimestamp(expiration, tz=datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
             print(f"Token expires at: {expires_at}")
+        # Check if token is expired
+        if expiration and datetime.datetime.now(datetime.timezone.utc).timestamp() > expiration:
+            print("Token is expired.")
+            return False
         return True
     except jwt.ExpiredSignatureError:
         return False
