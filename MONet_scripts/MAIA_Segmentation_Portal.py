@@ -234,7 +234,7 @@ class MAIAInferenceApp(QWidget):
             num_channels = 1 if len(img.GetSize()) < 4 else img.GetSize()[3]
 
             if num_channels != len(required_channels):
-                QMessageBox.critical(self, "Input Error", f"Expected {len(required_channels)} channels, got {num_channels}.")
+                QMessageBox.critical(self, "Input Error", f"The model you selected ({model}) expected {len(required_channels)} channels, got {num_channels}.")
                 return
 
             with open(input_file, "rb") as f:
@@ -257,6 +257,8 @@ def main():
     
     app = QApplication(sys.argv)
     window = MAIAInferenceApp()
+    with importlib.resources.path("MONet.icons", "logo.svg") as icon_path:
+        app.setWindowIcon(QIcon(str(icon_path)))
     window.show()
     sys.exit(app.exec_())
 
