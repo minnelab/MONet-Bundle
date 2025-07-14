@@ -1,5 +1,6 @@
 mkdir -p docs/source/apidocs/tutorials
 cp README.md docs/source/README.md
+cp MAIA_Segmentation_Portal.md docs/source/MAIA_Segmentation_Portal.md
 sed -i 's|\./|apidocs/tutorials/|g' docs/source/README.md
 cp MONet_Bundle.ipynb docs/source/apidocs/tutorials/MONet_Bundle.ipynb
 cp 06_monet_bundle.ipynb docs/source/apidocs/tutorials/06_monet_bundle.ipynb

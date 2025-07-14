@@ -27,6 +27,8 @@ This repository contains the implementation of the MONet Bundle, with some instr
 
 For more details about the MONet Bundle, please refer to the Jupyter notebook [MONet_Bundle.ipynb](./MONet_Bundle.ipynb).
 
+## 2025-07-14 UPDATE: MAIA Segmentation Portal Released!
+Curious to try the models through a user-friendly web interface? Explore the newly launched [MAIA Segmentation Portal](MAIA_Segmentation_Portal.md), where you can quickly upload your medical images and receive predictions in seconds. Prefer to keep your data local? No problem — simply download the models and run inference on your own machine with a single command!
 
 ## 2025-06-25 UPDATE: Check out the MONet Bundle for FedBraTS and FedLymphoma!
 The MONet Bundle has been used in the Federated Brain Tumor Segmentation [FedBraTS](./Projects/FedBraTS/README.md) and Federated Lymphoma Segmentation [FedLymphoma](./Projects/FedLymphoma/README.md) projects, which are described in the following paper:
