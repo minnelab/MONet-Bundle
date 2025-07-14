@@ -31,7 +31,8 @@ setup(
     zip_safe=False,
     data_files=[('', ["requirements.txt"]), ],
     package_data={
-        "": ["configs/*.yaml", "configs/*.json", "configs/*.yml","MONet/icons/*.png", "MONet/icons/*.svg"],
+        "": ["configs/*.yaml", "configs/*.json", "configs/*.yml"],
+        "MONet.icons": ["*.png", "*.svg"],
     },
     entry_points={
         "console_scripts": [

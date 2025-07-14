@@ -52,6 +52,8 @@ def main():
     for line in logo_lines:
         print(line)
 
+    home = os.path.expanduser("~")
+    Path(home, ".monet").mkdir(parents=True, exist_ok=True)
     if verify_valid_token_exists(args.username):
         print("\n")
         print(f"Welcome back {args.username}!")
@@ -79,8 +81,7 @@ def main():
         try:
             response = get_token(args.username, args.password)
             token = response.get("access_token")
-            home = os.path.expanduser("~")
-            Path(home, ".monet").mkdir(parents=True, exist_ok=True)
+
             auth_path = os.path.join(home, ".monet", f"{args.username}_auth.json")
             with open(auth_path, "w") as token_file:
                 json.dump(response, token_file)
