@@ -45,6 +45,7 @@ setup(
             "MONet_run_conversion = MONet_scripts.MONet_run_conversion:main",
             "MONet_inference_nifti = MONet_scripts.MONet_inference_nifti:main",
             "MONet_inference_dicom = MONet_scripts.MONet_inference_dicom:main",
+            "MAIA-Segmentation-Portal = MONet_scripts.MAIA_Segmentation_Portal:main",
         ],
     },
     keywords=["monai", "model inference", "pytorch", "monet bundle", "maia"],

@@ -10,7 +10,7 @@ output_rst = os.path.join(os.path.dirname(__file__),'..', 'source', 'apidocs', '
 script_files = [
     os.path.splitext(f)[0]
     for f in os.listdir(scripts_folder)
-    if os.path.isfile(os.path.join(scripts_folder, f)) and f.endswith('.py')
+    if os.path.isfile(os.path.join(scripts_folder, f)) and f.endswith('.py') and f.startswith('MONet_') and f != '__init__.py'
 ]
 
 # Sort scripts alphabetically
