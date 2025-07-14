@@ -4,3 +4,5 @@ include configs/*.json
 include README.md
 include LICENSE
 include_package_data=True
+recursive-include MONet/icons *.png
+recursive-include MONet/icons *.svg

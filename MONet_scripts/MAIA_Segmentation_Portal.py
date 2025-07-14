@@ -11,7 +11,7 @@ import sys
 from PyQt5.QtGui import QIcon
 from MONet.auth import get_token, verify_valid_token_exists, welcome_message
 from MONet.utils import get_available_models
-
+import importlib.resources
 class MAIAInferenceApp(QWidget):
     def __init__(self):
         super().__init__()
@@ -94,10 +94,20 @@ class MAIAInferenceApp(QWidget):
         # Add a logo at the top
         logo_label = QLabel()
         logo_label.setAlignment(Qt.AlignCenter)
-        logo_path = "icons/logo.svg"  # Update with your logo path
-        logo_label.setPixmap(QIcon(logo_path).pixmap(120, 120))
+        
+        with importlib.resources.path("MONet.icons", "logo.svg") as icon_path:
+            logo_label.setPixmap(QIcon(icon_path).pixmap(120, 120))
+            
         logo_label.setCursor(Qt.PointingHandCursor)
-        logo_label.mousePressEvent = lambda event: os.system('xdg-open "https://maia.app.cloud.cbh.kth.se"')
+        def open_maia_website(event):
+            url = "https://maia.app.cloud.cbh.kth.se"
+            if sys.platform.startswith("win"):
+                os.startfile(url)
+            elif sys.platform.startswith("darwin"):
+                os.system(f'open "{url}"')
+            else:
+                os.system(f'xdg-open "{url}"')
+        logo_label.mousePressEvent = open_maia_website
         layout.addWidget(logo_label)
         welcome_label = QLabel(f"Welcome to MAIA Segmentation Portal, {self.username}! ")
         welcome_label_2 = QLabel("Select an option below: ")
@@ -138,7 +148,8 @@ class MAIAInferenceApp(QWidget):
         
         home_button = QPushButton("")
         home_button.setFixedSize(40, 40)
-        home_button.setIcon(QIcon("icons/Home-icon.svg.png"))  # or .png
+        with importlib.resources.path("MONet.icons", "Home-icon.svg.png") as icon_path:
+            home_button.setIcon(QIcon(icon_path))  # or .png
         home_button.setIconSize(home_button.size())
         home_button.setToolTip("Home")
         # Alternatively, use a local icon file:

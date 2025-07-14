@@ -80,7 +80,9 @@ def main():
             token = response.get("access_token")
             home = os.path.expanduser("~")
             auth_path = os.path.join(home, ".monet", f"{args.username}_auth.json")
-            os.makedirs(os.path.dirname(auth_path), exist_ok=True)
+            auth_dir = os.path.dirname(auth_path)
+            if not os.path.exists(auth_dir):
+                os.makedirs(auth_dir, exist_ok=True)
             with open(auth_path, "w") as token_file:
                 json.dump(response, token_file)
             print("\n")
