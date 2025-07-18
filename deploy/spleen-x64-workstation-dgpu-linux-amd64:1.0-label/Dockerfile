@@ -21,7 +21,27 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/${UNAME}/.local/lib/python3.10/site-p
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir --user -r /tmp/requirements.txt
 
-RUN pip install git+https://github.com/SimoneBendazzoli93/MONAILabel.git@2bf1675c3106f19be0ea8122b2dba4f632e72424
+SHELL ["/bin/bash", "-c"]
+# Install NVM
+ENV NVM_DIR=/root/.nvm
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash \
+    && source $NVM_DIR/nvm.sh \
+    && nvm install 18 \
+    && nvm alias default 18 \
+    && nvm use default
+
+# Add Node.js and npm to PATH for future RUNs and the container environment
+ENV NODE_VERSION=18
+ENV PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+
+
+RUN git clone https://github.com/SimoneBendazzoli93/MONAILabel.git && cd MONAILabel && git checkout 59cbf37caff05cba5278f3e9c4ee9b0113456b17
+
+RUN export NVM_DIR=/root/.nvm && \
+    source $NVM_DIR/nvm.sh && \
+    nvm use 18 && \
+    node -v && \
+    BUILD_OHIF=true pip install -e MONAILabel
 
 RUN cd /opt/holoscan/monailabel && monailabel apps --download --name monaibundle --output .
 
