@@ -393,6 +393,16 @@ main() {
             args=$(printf " %s" "${@}")
             info "Launching application ${command} ${args:1}..."
             eval ${command} "$@"
+            if [ -n "$ORTHANC_URL" ]; then
+                for file in "${HOLOSCAN_OUTPUT_PATH}"/*.dcm; do
+                    if [ -f "$file" ]; then
+                        curl -X POST "$ORTHANC_URL/instances" -H "Content-Type: application/dicom" --data-binary @"$file"
+                    fi
+                done
+
+            else
+                error "ORTHANC_URL is not set. Skipping the curl command."
+            fi
             exit_code=$?
             if [ $exit_code -ne 0 ] && [ -f /.dockerenv ] && [ "$HOLOSCAN_HOSTING_SERVICE" != "HOLOSCAN_RUN" ]; then
                 newline
