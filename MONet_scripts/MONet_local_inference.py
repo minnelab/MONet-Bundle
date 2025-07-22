@@ -7,7 +7,7 @@ import os
 
 import requests
 import SimpleITK as sitk
-
+from pathlib import Path
 from MONet.utils import get_available_models
 
 try:
@@ -43,21 +43,16 @@ def get_arg_parser():
     return parser
 
 
-def main():
-    parser = get_arg_parser()
-    args = parser.parse_args()
-
-    model_name = args.model
-
+def run_inference(model_name: str, username: str, input_image: str, output_folder: str):
     home = os.path.expanduser("~")
     model_path = os.path.join(home, ".monet", "models", model_name + ".ts")
 
     if not os.path.exists(model_path):
-        auth_path = os.path.join(home, ".monet", f"{args.username}_auth.json")
+        auth_path = os.path.join(home, ".monet", f"{username}_auth.json")
         with open(auth_path, "r") as token_file:
             token_data = json.load(token_file)
             token = token_data.get("access_token")
-            models = get_available_models(token, args.username)
+            models = get_available_models(token, username)
             maia_segmentation_portal_url = models.get(model_name)
             if not maia_segmentation_portal_url:
                 raise ValueError(f"Model '{model_name}' is not supported. Available models: {list(models.keys())}")
@@ -86,9 +81,9 @@ def main():
     for idx, channel in enumerate(required_input_channels):
         print(f"Input Channel {idx}: {channel}")
     print(f"Expected Output Labels: {model_metadata['outputs']['pred']['channel_def']}")
-    if args.input_image.endswith(".nii.gz"):
-        print(f"Verifying input file: {args.input_image}")
-        input_img = sitk.ReadImage(args.input_image)
+    if input_image.endswith(".nii.gz"):
+        print(f"Verifying input file: {input_image}")
+        input_img = sitk.ReadImage(input_image)
         print(f"Input image size: {input_img.GetSize()}")
         n_channels = 1
         if len(input_img.GetSize()) == 4:
@@ -111,7 +106,7 @@ def main():
             print("\t<reference_modality> is the modality to which all other modalities will be resampled, e.g., 'CT'.")
             return
         else:
-            print(f"Input file {args.input_image} is valid for the model {model_name}.")
+            print(f"Input file {input_image} is valid for the model {model_name}.")
 
     print(json.dumps(metadata, indent=4))
     parser = ConfigParser(inference)
@@ -123,14 +118,25 @@ def main():
     transforms = Compose([LoadImaged(keys=["image"]), EnsureChannelFirstd(keys=["image"])])
 
     # Load and transform the input image
-    data = transforms({"image": args.input_image})
+    data = transforms({"image": input_image})
 
     # Perform prediction
 
     pred = nnunet_predictor(data["image"][None])
 
     # Save the prediction
-    SaveImage(output_dir=args.output_folder, separate_folder=False, output_postfix="segmentation", output_ext=".nii.gz")(pred[0])
+    SaveImage(output_dir=output_folder, separate_folder=False, output_postfix="segmentation", output_ext=".nii.gz")(pred[0])
+    return Path(input_image).name[:-len(".nii.gz")] + "_segmentation.nii.gz"
+
+def main():
+    parser = get_arg_parser()
+    args = parser.parse_args()
+
+    model_name = args.model
+    username = args.username
+    input_image = args.input_image
+    output_folder = args.output_folder
+    run_inference(model_name, username, input_image, output_folder)
 
 
 if __name__ == "__main__":

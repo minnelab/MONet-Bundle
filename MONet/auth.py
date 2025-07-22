@@ -82,6 +82,26 @@ def verify_valid_token_exists(username: str) -> bool:
         # Check if token is expired
         if expiration and datetime.datetime.now(datetime.timezone.utc).timestamp() > expiration:
             print("Token is expired.")
+            # Try to refresh the token using refresh_token if available
+            refresh_token = token_data.get("refresh_token")
+            if refresh_token:
+                url = "https://iam.cloud.cbh.kth.se/realms/cloud/protocol/openid-connect/token"
+                data = {
+                    "grant_type": "refresh_token",
+                    "refresh_token": refresh_token,
+                    "client_id": "monailabel-app"
+                }
+                try:
+                    response = requests.post(url, data=data)
+                    response.raise_for_status()
+                    new_token_data = response.json()
+                    # Save new token data to file
+                    with open(auth_path, "w") as token_file:
+                        json.dump(new_token_data, token_file)
+                    print("Token refreshed successfully.")
+                    return True
+                except requests.RequestException as e:
+                    print(f"Failed to refresh token: {e}")
             return False
         return True
     except jwt.ExpiredSignatureError:

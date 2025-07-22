@@ -11,24 +11,45 @@ import sys
 from PyQt5.QtGui import QIcon
 from MONet.auth import get_token, verify_valid_token_exists, welcome_message
 from MONet.utils import get_available_models
+import requests
+from pathlib import Path
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QDialog, QVBoxLayout
 import importlib.resources
 class MAIAInferenceApp(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("MAIA Segmentation Portal")
+        # Get latest tag from GitHub for version
+        try:
+            resp = requests.get("https://api.github.com/repos/SimoneBendazzoli93/MONet-Bundle/tags", timeout=3)
+            if resp.ok and resp.json():
+                version = resp.json()[0]["name"]
+            else:
+                version = "unknown"
+        except Exception:
+            version = "unknown"
+        self.setWindowTitle("MAIA Segmentation Portal - {}".format(version))
         self.resize(400, 200)
         self.token = None
         self.models = {}
-        self.username = ""
+        try:
+            os.makedirs(os.path.expanduser("~/.monet"), exist_ok=True)
+            # Check if an auth file exists for the user
+            auth_files = [f for f in os.listdir(os.path.expanduser("~/.monet")) if f.endswith("_auth.json")]
+            if auth_files:
+                print("Found auth files:", auth_files)
+                self.username = auth_files[0].replace("_auth.json", "")
+        except Exception as e:
+            self.username = ""
 
         self.username_input = QLineEdit()
+        self.username_input.setText(self.username)
         self.password_input = QLineEdit()
         self.login_button = QPushButton("Login")
 
         self.input_path_input = QLineEdit()
         self.output_path_input = QLineEdit()
         self.model_dropdown = QComboBox()
-        self.infer_button = QPushButton("Run Remote Inference")
+        self.infer_button = QPushButton("Run Inference")
         btn_font = self.infer_button.font()
         btn_font.setPointSize(14)
         btn_font.setFamily("Ubuntu")
@@ -87,8 +108,17 @@ class MAIAInferenceApp(QWidget):
     def init_main_ui(self):
         self.setWindowTitle("MAIA Segmentation Portal - Home")
         
-        for i in reversed(range(self.layout().count())):
-            self.layout().itemAt(i).widget().setParent(None)
+        # Remove all widgets and layouts from the current layout (handle nested layouts)
+        def clear_layout(layout):
+            while layout.count():
+                item = layout.takeAt(0)
+                widget = item.widget()
+                child_layout = item.layout()
+                if widget is not None:
+                    widget.setParent(None)
+                elif child_layout is not None:
+                    clear_layout(child_layout)
+        clear_layout(self.layout())
         layout = self.layout()
 
         # Add a logo at the top
@@ -129,6 +159,9 @@ class MAIAInferenceApp(QWidget):
         remote_infer_btn = QPushButton("Remote Inference")
         remote_infer_btn.clicked.connect(self.init_inference_ui)
         remote_infer_btn.setSizePolicy(remote_infer_btn.sizePolicy().horizontalPolicy(), remote_infer_btn.sizePolicy().verticalPolicy())
+        # Double the normal size
+        remote_infer_btn.setMinimumHeight(remote_infer_btn.sizeHint().height() * 2)
+        remote_infer_btn.setMinimumWidth(remote_infer_btn.sizeHint().width() * 2)
         remote_infer_btn.adjustSize()
         # Set custom font for button text
         btn_font = remote_infer_btn.font()
@@ -136,12 +169,62 @@ class MAIAInferenceApp(QWidget):
         btn_font.setFamily("Ubuntu")
         remote_infer_btn.setFont(btn_font)
         
+        
+        local_infer_btn = QPushButton("Local Inference")
+        local_infer_btn.clicked.connect(self.local_inference_ui)
+        local_infer_btn.setSizePolicy(local_infer_btn.sizePolicy().horizontalPolicy(), local_infer_btn.sizePolicy().verticalPolicy())
+        local_infer_btn.setFont(btn_font)   
+        local_infer_btn.setMinimumHeight(local_infer_btn.sizeHint().height() * 2)
+        local_infer_btn.setMinimumWidth(local_infer_btn.sizeHint().width() * 2)
+        local_infer_btn.adjustSize()
+
+        model_info_btn = QPushButton("Available Models")
+        model_info_btn.clicked.connect(self.init_models_info)
+        model_info_btn.setSizePolicy(model_info_btn.sizePolicy().horizontalPolicy(), model_info_btn.sizePolicy().verticalPolicy())
+        
+        model_info_btn.adjustSize()
+        model_info_btn.setFont(btn_font)
+        
+        concat_modalities_btn = QPushButton("Concatenate Modalities")
+        concat_modalities_btn.clicked.connect(self.init_concat_ui)
+        concat_modalities_btn.setSizePolicy(concat_modalities_btn.sizePolicy().horizontalPolicy(), concat_modalities_btn.sizePolicy().verticalPolicy())
+        concat_modalities_btn.setMinimumHeight(concat_modalities_btn.sizeHint().height() * 2)
+        concat_modalities_btn.setMinimumWidth(concat_modalities_btn.sizeHint().width() * 2)
+        concat_modalities_btn.adjustSize()
+        concat_modalities_btn.setFont(btn_font)
+        
+        # Add icon to the Remote Inference button
+        with importlib.resources.path("MONet.icons", "Remote.png") as icon_path:
+            remote_infer_btn.setIcon(QIcon(str(icon_path)))
+            remote_infer_btn.setIconSize(remote_infer_btn.size())
+            remote_infer_btn.setStyleSheet("text-align: left; padding-left: 40px;")  # Align icon left, add padding for text
         layout.addWidget(remote_infer_btn)
+        # Add icon to the Local Inference button
+        with importlib.resources.path("MONet.icons", "Local.png") as icon_path:
+            local_infer_btn.setIcon(QIcon(str(icon_path)))
+            local_infer_btn.setIconSize(local_infer_btn.size())
+            local_infer_btn.setStyleSheet("text-align: left; padding-left: 40px;")  # Align icon left, add padding for text
+        layout.addWidget(local_infer_btn)
+        layout.addWidget(model_info_btn)
+        with importlib.resources.path("MONet.icons", "Concatenate.png") as icon_path:
+            concat_modalities_btn.setIcon(QIcon(str(icon_path)))
+            concat_modalities_btn.setIconSize(concat_modalities_btn.size())
+            concat_modalities_btn.setStyleSheet("text-align: left; padding-left: 40px;")  # Align icon left, add padding for text
+        layout.addWidget(concat_modalities_btn)
 
     def init_inference_ui(self):
         self.setWindowTitle("MAIA Segmentation Portal - Remote Inference")
-        for i in reversed(range(self.layout().count())):
-            self.layout().itemAt(i).widget().setParent(None)
+
+        def clear_layout(layout):
+            while layout.count():
+                item = layout.takeAt(0)
+                widget = item.widget()
+                child_layout = item.layout()
+                if widget is not None:
+                    widget.setParent(None)
+                elif child_layout is not None:
+                    clear_layout(child_layout)
+        clear_layout(self.layout())
 
         layout = self.layout() #QVBoxLayout()
 
@@ -200,6 +283,296 @@ class MAIAInferenceApp(QWidget):
 
         self.setLayout(layout)
 
+    def local_inference_ui(self):
+        self.setWindowTitle("MAIA Segmentation Portal - Local Inference")
+
+        def clear_layout(layout):
+            while layout.count():
+                item = layout.takeAt(0)
+                widget = item.widget()
+                child_layout = item.layout()
+                if widget is not None:
+                    widget.setParent(None)
+                elif child_layout is not None:
+                    clear_layout(child_layout)
+        clear_layout(self.layout())
+
+        layout = self.layout() #QVBoxLayout()
+        
+        home_button = QPushButton("")
+        home_button.setFixedSize(40, 40)
+        with importlib.resources.path("MONet.icons", "Home-icon.svg.png") as icon_path:
+            home_button.setIcon(QIcon(str(icon_path)))  # or .png
+        home_button.setIconSize(home_button.size())
+        home_button.setToolTip("Home")
+        # Alternatively, use a local icon file:
+        # home_button.setIcon(QIcon("/path/to/home_icon.png"))
+        home_button.clicked.connect(self.init_main_ui)
+        layout.addWidget(home_button)
+        label_input = QLabel("1. Select Input File:")
+        font = label_input.font()
+        font.setPointSize(14)
+        font.setFamily("Ubuntu")
+        label_input.setFont(font)
+        layout.addWidget(label_input)
+        layout.addWidget(self.input_path_input)
+        browse_input = QPushButton("Browse")
+        browse_input.clicked.connect(self.browse_input)
+        layout.addWidget(browse_input)
+        separator = QLabel()
+        separator.setFrameShape(QLabel.HLine)
+        separator.setFrameShadow(QLabel.Sunken)
+        layout.addWidget(separator)
+        label_output = QLabel("2. Select Output Folder:")
+        font_output = label_output.font()
+        font_output.setPointSize(14)
+        font_output.setFamily("Ubuntu")
+        label_output.setFont(font_output)
+        layout.addWidget(label_output)
+        layout.addWidget(self.output_path_input)
+        browse_output = QPushButton("Browse")
+        browse_output.clicked.connect(self.browse_output_folder)
+        layout.addWidget(browse_output)
+        separator2 = QLabel()
+        separator2.setFrameShape(QLabel.HLine)
+        separator2.setFrameShadow(QLabel.Sunken)
+        layout.addWidget(separator2)
+        label_model = QLabel("3. Choose Model:")
+        font_model = label_model.font()
+        font_model.setPointSize(14)
+        font_model.setFamily("Ubuntu")
+        label_model.setFont(font_model)
+        layout.addWidget(label_model)
+        if len(self.models.keys()) == 0:
+            self.models = get_available_models(self.token, self.username)
+            self.model_dropdown.addItems(list(self.models.keys()))
+        layout.addWidget(self.model_dropdown)
+
+        self.infer_button.clicked.connect(self.run_local_inference)
+        layout.addWidget(self.infer_button)
+
+        self.setLayout(layout)
+        
+    def run_local_inference(self):
+        try:
+            from MONet_scripts.MONet_local_inference import run_inference as local_inference_main
+            output_image = local_inference_main(self.model_dropdown.currentText(), self.username, self.input_path_input.text(), self.output_path_input.text())
+            QMessageBox.information(self, "Inference Completed", f"Segmentation saved to {Path(self.output_path_input.text()).joinpath(output_image)}")
+        except ImportError:
+            QMessageBox.critical(self, "Import Error", "Failed to import the local inference function. Please ensure MONet package is installed.")
+            return
+        
+    def init_models_info(self):
+        if len(self.models.keys()) == 0:
+            self.models = get_available_models(self.token, self.username)
+        # Gather info for all models
+        model_infos = []
+        for model in self.models:
+            response = requests.get(f"{self.models[model]}info/", headers={"Authorization": f"Bearer {self.token}"})
+            if response.status_code == 200:
+                model_info = response.json()['models']['MONetBundle']
+                labels = ", ".join(model_info.get('labels', []))
+                description = model_info.get('description', '')
+                inputs = ", ".join(model_info.get('metadata', {}).get('inputs', []))
+                model_infos.append((model, labels, description, inputs))
+            else:
+                print(f"Failed to retrieve info for model {model}")
+
+        if model_infos:
+            dialog = QDialog(self)
+            dialog.setWindowTitle("Available Models")
+            table = QTableWidget(len(model_infos), 4)
+            table.setHorizontalHeaderLabels(["Model","Description", "Inputs", "Labels"])
+            for row, (model, labels, description, inputs) in enumerate(model_infos):
+                table.setItem(row, 0, QTableWidgetItem(model))
+                table.setItem(row, 1, QTableWidgetItem(description))
+                table.setItem(row, 2, QTableWidgetItem(inputs))
+                table.setItem(row, 3, QTableWidgetItem(labels))
+                table.resizeColumnsToContents()
+
+            layout = QVBoxLayout()
+            layout.addWidget(table)
+            dialog.setLayout(layout)
+            table.resizeColumnsToContents()
+            table.resizeRowsToContents()
+            dialog.resize(table.horizontalHeader().length() + 40, table.verticalHeader().length() + 80)
+            dialog.exec_()
+        else:
+            print(f"Failed to retrieve info for model {model}")
+
+    def init_concat_ui(self):
+        self.setWindowTitle("MAIA Segmentation Portal - Concatenate Modalities")
+
+        def clear_layout(layout):
+            while layout.count():
+                item = layout.takeAt(0)
+                widget = item.widget()
+                child_layout = item.layout()
+                if widget is not None:
+                    widget.setParent(None)
+                elif child_layout is not None:
+                    clear_layout(child_layout)
+        clear_layout(self.layout())
+        layout = self.layout()
+
+        home_button = QPushButton("")
+        home_button.setFixedSize(40, 40)
+        with importlib.resources.path("MONet.icons", "Home-icon.svg.png") as icon_path:
+            home_button.setIcon(QIcon(str(icon_path)))  # or .png
+        home_button.setIconSize(home_button.size())
+        home_button.setToolTip("Home")
+        home_button.clicked.connect(self.init_main_ui)
+        layout.addWidget(home_button)
+
+        if len(self.models.keys()) == 0:
+            self.models = get_available_models(self.token, self.username)
+            self.model_dropdown.addItems(list(self.models.keys()))
+        layout.addWidget(self.model_dropdown)
+
+        # Container for input selectors
+        self.input_selectors = []
+
+        # Widget to hold input selectors
+        self.inputs_widget = QWidget()
+        self.inputs_layout = QVBoxLayout()
+        self.inputs_widget.setLayout(self.inputs_layout)
+        layout.addWidget(self.inputs_widget)
+
+        def update_input_selectors():
+            # Clear previous selectors
+            for selector in self.input_selectors:
+                self.inputs_layout.removeWidget(selector)
+                selector.deleteLater()
+            self.input_selectors = []
+
+            model = self.model_dropdown.currentText()
+            if not model:
+                return
+
+            # Fetch model info
+            try:
+                response = requests.get(f"{self.models[model]}info/", headers={"Authorization": f"Bearer {self.token}"})
+                response.raise_for_status()
+                model_metadata = response.json()["models"]["MONetBundle"]["metadata"]
+                required_channels = model_metadata.get("inputs", [])
+            except Exception as e:
+                QMessageBox.critical(self, "Model Info Error", f"Could not fetch model info: {e}")
+                return
+
+            # Create selectors for each required input
+            for idx, channel in enumerate(required_channels):
+                selector_layout = QHBoxLayout()
+                label = QLabel(f"Input {idx+1} ({channel}):")
+                line_edit = QLineEdit()
+                browse_btn = QPushButton("Browse")
+                def browse_file(le):
+                    path, _ = QFileDialog.getOpenFileName(self, "Select Input File", "", "NIfTI Files (*.nii.gz)")
+                    if path:
+                        le.setText(path)
+                browse_btn.clicked.connect(lambda _, le=line_edit: browse_file(le))
+                selector_layout.addWidget(label)
+                selector_layout.addWidget(line_edit)
+                selector_layout.addWidget(browse_btn)
+                container = QWidget()
+                container.setLayout(selector_layout)
+                # Store both the container and the line_edit for easy access
+                container.line_edit = line_edit
+                self.inputs_layout.addWidget(container)
+                self.input_selectors.append(container)
+
+        self.model_dropdown.currentIndexChanged.connect(update_input_selectors)
+        update_input_selectors()
+
+        # Reference modality selector
+        ref_modality_layout = QHBoxLayout()
+        ref_modality_label = QLabel("Reference Modality:")
+        self.ref_modality_dropdown = QComboBox()
+        # Populate with required channels/modalities for the selected model
+        model = self.model_dropdown.currentText()
+        if model:
+            try:
+                response = requests.get(f"{self.models[model]}info/", headers={"Authorization": f"Bearer {self.token}"})
+                response.raise_for_status()
+                model_metadata = response.json()["models"]["MONetBundle"]["metadata"]
+                required_channels = model_metadata.get("inputs", [])
+                self.ref_modality_dropdown.addItems(required_channels)
+            except Exception as e:
+                self.ref_modality_dropdown.addItem("Unknown")
+        ref_modality_layout.addWidget(ref_modality_label)
+        ref_modality_layout.addWidget(self.ref_modality_dropdown)
+        layout.addLayout(ref_modality_layout)
+
+        # Update reference modality dropdown when model changes
+        def update_ref_modality_dropdown():
+            self.ref_modality_dropdown.clear()
+            model = self.model_dropdown.currentText()
+            if model:
+                try:
+                    response = requests.get(f"{self.models[model]}info/", headers={"Authorization": f"Bearer {self.token}"})
+                    response.raise_for_status()
+                    model_metadata = response.json()["models"]["MONetBundle"]["metadata"]
+                    required_channels = model_metadata.get("inputs", [])
+                    self.ref_modality_dropdown.addItems(required_channels)
+                except Exception as e:
+                    self.ref_modality_dropdown.addItem("Unknown")
+        self.model_dropdown.currentIndexChanged.connect(update_ref_modality_dropdown)
+
+        # Output file selector
+        output_layout = QHBoxLayout()
+        output_label = QLabel("Output File:")
+        self.output_path_input = QLineEdit()
+        output_browse_btn = QPushButton("Browse")
+        def browse_output_file():
+            path = QFileDialog.getExistingDirectory(self, "Select Output Folder", "")
+            if path:
+                self.output_path_input.setText(path)
+        output_browse_btn.clicked.connect(browse_output_file)
+        output_layout.addWidget(output_label)
+        output_layout.addWidget(self.output_path_input)
+        output_layout.addWidget(output_browse_btn)
+        layout.addLayout(output_layout)
+
+        # Concatenate button
+        concat_button = QPushButton("Concatenate Modalities")
+        concat_button.setFont(self.infer_button.font())
+        concat_button.clicked.connect(self.concatenate_modalities)
+        layout.addWidget(concat_button)
+    def concatenate_modalities(self):
+        input_files = []
+        for selector in self.input_selectors:
+            # Use the stored line_edit attribute
+            line_edit = getattr(selector, 'line_edit', None)
+            if line_edit is not None:
+                input_files.append(line_edit.text())
+            else:
+                input_files.append("")
+        
+        output_folder = self.output_path_input.text()
+
+        reference_modality = self.ref_modality_dropdown.currentText()
+        
+        modalities = []
+        for selector in self.input_selectors:
+            line_edit = getattr(selector, 'line_edit', None)
+            if line_edit is not None:
+                input_file = line_edit.text()
+                # Get the channel name from the label in the selector layout
+                label = selector.layout().itemAt(0).widget()
+                modality = label.text().split('(')[-1].rstrip('):')
+                modalities.append(modality)
+                print(f"Input file: {input_file}, Modality: {modality}")
+            # Now you have both input_file and modality for each input
+        try:
+            from MONet_scripts.MONet_concatenate_modalities import concatenate
+            data = {modality: input_file for modality, input_file in zip(modalities, input_files)}
+            print(f"Concatenating modalities: {data} with reference modality: {reference_modality} to output folder: {output_folder}")
+            QMessageBox.information(self, "Concatenation Started", "Concatenating modalities, please wait...",)
+            output_file = concatenate(data, reference_modality, output_folder)
+            QMessageBox.information(self, "Success", f"Modalities concatenated and saved to {Path(output_folder).joinpath(output_file)}")
+        except ImportError:
+            QMessageBox.critical(self, "Import Error", "Failed to import the concatenation function. Please ensure MONet package is installed.")
+            return
+
     def browse_input(self):
         path, _ = QFileDialog.getOpenFileName(self, "Select Input File", "", "NIfTI Files (*.nii.gz)")
         if path:
@@ -210,6 +583,10 @@ class MAIAInferenceApp(QWidget):
         if path:
             self.output_path_input.setText(path)
 
+    def browse_output_folder(self):
+        path = QFileDialog.getExistingDirectory(self, "Select Output Folder", "")
+        if path:
+            self.output_path_input.setText(path)
     def run_inference(self):
         input_file = self.input_path_input.text()
         output_file = self.output_path_input.text()

@@ -96,6 +96,49 @@ def get_arg_parser():
     return parser
 
 
+def concatenate(data: Dict[str, Any], ref_modality: str, output_folder: str) -> Any:
+    modalities = list(data.keys())
+    filenames = [data[modality] for modality in modalities]
+    # Extract the suffix as the part after the last "_" or "-" in the filename
+    base = filenames[0]
+    if "_" in base and (base.rfind("_") > base.rfind("-")):
+        suffix = "_" + base.split("_")[-1]
+    elif "-" in base:
+        suffix = "-" + base.split("-")[-1]
+    else:
+        suffix = ""
+    load = Compose(
+        [LoadImage(), EnsureChannelFirst()]
+    )  # LoadImage will handle NIfTI files and EnsureChannelFirst ensures the channel dimension is first
+    resample = SpatialResample(mode="bilinear")
+    concatenate = ConcatItemsd(keys=list(modalities), name="image")
+    formatter = NIFTINameFormatter(suffix=suffix)
+    save = SaveImage(output_dir=output_folder, output_name_formatter=formatter, output_postfix="image", separate_folder=False)
+    
+    for modality, filename in zip(modalities, filenames):
+        data[modality] = load(filename)
+    for modality in modalities:
+        if modality != ref_modality:
+            try:
+                source_affine_4x4 = define_affine_from_meta(data[modality].meta)
+                data[modality].meta["affine"] = torch.Tensor(source_affine_4x4)
+            except KeyError:
+                source_affine_4x4 = data[modality].meta["affine"]
+
+            try:
+                target_affine_4x4 = define_affine_from_meta(data[ref_modality].meta)
+            except KeyError:
+                target_affine_4x4 = data[ref_modality].meta["affine"]
+
+            data[modality].meta["pixdim"] = data[ref_modality].meta["pixdim"]
+            data[modality] = resample(
+                data[modality], dst_affine=target_affine_4x4, spatial_size=data[ref_modality].shape[1:]
+            )
+    data = concatenate(data)["image"]
+    save(data)
+    return filenames[0][: -len(suffix)] + "_image.nii.gz"
+
+
 def main():
 
     args = get_arg_parser().parse_args()
@@ -110,41 +153,15 @@ def main():
         modality, filename = mapping.split(":")
         modality_mapping[modality] = filename
 
-    load = Compose(
-        [LoadImage(), EnsureChannelFirst()]
-    )  # LoadImage will handle NIfTI files and EnsureChannelFirst ensures the channel dimension is first
-    resample = SpatialResample(mode="bilinear")
-    concatenate = ConcatItemsd(keys=list(modality_mapping.keys()), name="image")
     ref_modality = args.ref_modality
-    formatter = NIFTINameFormatter(modality_mapping[list(modality_mapping.keys())[0]])
-    save = SaveImage(output_dir=output_folder, output_name_formatter=formatter, output_postfix="image", separate_folder=False)
 
     for subfolder in Path(input_folder).iterdir():
         if subfolder.is_dir():
             data = {}
             for modality, filename in modality_mapping.items():
                 file_path = Path(subfolder).joinpath(subfolder.name + filename)
-                data[modality] = load(file_path)
-            for modality in modality_mapping.keys():
-                if modality != ref_modality:
-                    try:
-                        source_affine_4x4 = define_affine_from_meta(data[modality].meta)
-                        data[modality].meta["affine"] = torch.Tensor(source_affine_4x4)
-                    except KeyError:
-                        source_affine_4x4 = data[modality].meta["affine"]
-
-                    try:
-                        target_affine_4x4 = define_affine_from_meta(data[ref_modality].meta)
-                    except KeyError:
-                        target_affine_4x4 = data[ref_modality].meta["affine"]
-
-                    data[modality].meta["pixdim"] = data[ref_modality].meta["pixdim"]
-                    data[modality] = resample(
-                        data[modality], dst_affine=target_affine_4x4, spatial_size=data[ref_modality].shape[1:]
-                    )
-            data = concatenate(data)["image"]
-
-            save(data)
+                data[modality] = file_path
+            concatenate(data, ref_modality, output_folder)
 
 
 if __name__ == "__main__":
