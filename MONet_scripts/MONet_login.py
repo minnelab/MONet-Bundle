@@ -5,8 +5,8 @@ import argparse
 import getpass
 import json
 import os
-
 from pathlib import Path
+
 import requests
 
 from MONet.auth import get_token, verify_valid_token_exists, welcome_message

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import datetime
 import json
 import os
-import datetime
+
 import jwt
 import requests
 from jwt import decode
@@ -86,11 +87,7 @@ def verify_valid_token_exists(username: str) -> bool:
             refresh_token = token_data.get("refresh_token")
             if refresh_token:
                 url = "https://iam.cloud.cbh.kth.se/realms/cloud/protocol/openid-connect/token"
-                data = {
-                    "grant_type": "refresh_token",
-                    "refresh_token": refresh_token,
-                    "client_id": "monailabel-app"
-                }
+                data = {"grant_type": "refresh_token", "refresh_token": refresh_token, "client_id": "monailabel-app"}
                 try:
                     response = requests.post(url, data=data)
                     response.raise_for_status()

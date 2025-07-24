@@ -1,20 +1,35 @@
-import os
+from __future__ import annotations
+
+import importlib.resources
 import json
+import os
+import sys
+from pathlib import Path
+
 import requests
 import SimpleITK as sitk
-from PyQt5.QtWidgets import (
-    QApplication, QWidget, QLabel, QLineEdit, QPushButton,
-    QVBoxLayout, QHBoxLayout, QFileDialog, QComboBox, QMessageBox
-)
 from PyQt5.QtCore import Qt
-import sys
 from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import (
+    QApplication,
+    QComboBox,
+    QDialog,
+    QFileDialog,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
+
 from MONet.auth import get_token, verify_valid_token_exists, welcome_message
 from MONet.utils import get_available_models
-import requests
-from pathlib import Path
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QDialog, QVBoxLayout
-import importlib.resources
+
+
 class MAIAInferenceApp(QWidget):
     def __init__(self):
         super().__init__()
@@ -38,7 +53,7 @@ class MAIAInferenceApp(QWidget):
             if auth_files:
                 print("Found auth files:", auth_files)
                 self.username = auth_files[0].replace("_auth.json", "")
-        except Exception as e:
+        except Exception:
             self.username = ""
 
         self.username_input = QLineEdit()
@@ -54,9 +69,9 @@ class MAIAInferenceApp(QWidget):
         btn_font.setPointSize(14)
         btn_font.setFamily("Ubuntu")
         self.infer_button.setFont(btn_font)
-        
+
         self.init_login_ui()
-        
+
     def init_login_ui(self):
         layout = QVBoxLayout()
 
@@ -107,7 +122,7 @@ class MAIAInferenceApp(QWidget):
 
     def init_main_ui(self):
         self.setWindowTitle("MAIA Segmentation Portal - Home")
-        
+
         # Remove all widgets and layouts from the current layout (handle nested layouts)
         def clear_layout(layout):
             while layout.count():
@@ -118,17 +133,19 @@ class MAIAInferenceApp(QWidget):
                     widget.setParent(None)
                 elif child_layout is not None:
                     clear_layout(child_layout)
+
         clear_layout(self.layout())
         layout = self.layout()
 
         # Add a logo at the top
         logo_label = QLabel()
         logo_label.setAlignment(Qt.AlignCenter)
-        
+
         with importlib.resources.path("MONet.icons", "logo.svg") as icon_path:
             logo_label.setPixmap(QIcon(str(icon_path)).pixmap(120, 120))
-            
+
         logo_label.setCursor(Qt.PointingHandCursor)
+
         def open_maia_website(event):
             url = "https://maia.app.cloud.cbh.kth.se"
             if sys.platform.startswith("win"):
@@ -137,6 +154,7 @@ class MAIAInferenceApp(QWidget):
                 os.system(f'open "{url}"')
             else:
                 os.system(f'xdg-open "{url}"')
+
         logo_label.mousePressEvent = open_maia_website
         layout.addWidget(logo_label)
         welcome_label = QLabel(f"Welcome to MAIA Segmentation Portal, {self.username}! ")
@@ -158,7 +176,9 @@ class MAIAInferenceApp(QWidget):
 
         remote_infer_btn = QPushButton("Remote Inference")
         remote_infer_btn.clicked.connect(self.init_inference_ui)
-        remote_infer_btn.setSizePolicy(remote_infer_btn.sizePolicy().horizontalPolicy(), remote_infer_btn.sizePolicy().verticalPolicy())
+        remote_infer_btn.setSizePolicy(
+            remote_infer_btn.sizePolicy().horizontalPolicy(), remote_infer_btn.sizePolicy().verticalPolicy()
+        )
         # Double the normal size
         remote_infer_btn.setMinimumHeight(remote_infer_btn.sizeHint().height() * 2)
         remote_infer_btn.setMinimumWidth(remote_infer_btn.sizeHint().width() * 2)
@@ -168,12 +188,13 @@ class MAIAInferenceApp(QWidget):
         btn_font.setPointSize(14)
         btn_font.setFamily("Ubuntu")
         remote_infer_btn.setFont(btn_font)
-        
-        
+
         local_infer_btn = QPushButton("Local Inference")
         local_infer_btn.clicked.connect(self.local_inference_ui)
-        local_infer_btn.setSizePolicy(local_infer_btn.sizePolicy().horizontalPolicy(), local_infer_btn.sizePolicy().verticalPolicy())
-        local_infer_btn.setFont(btn_font)   
+        local_infer_btn.setSizePolicy(
+            local_infer_btn.sizePolicy().horizontalPolicy(), local_infer_btn.sizePolicy().verticalPolicy()
+        )
+        local_infer_btn.setFont(btn_font)
         local_infer_btn.setMinimumHeight(local_infer_btn.sizeHint().height() * 2)
         local_infer_btn.setMinimumWidth(local_infer_btn.sizeHint().width() * 2)
         local_infer_btn.adjustSize()
@@ -181,18 +202,20 @@ class MAIAInferenceApp(QWidget):
         model_info_btn = QPushButton("Available Models")
         model_info_btn.clicked.connect(self.init_models_info)
         model_info_btn.setSizePolicy(model_info_btn.sizePolicy().horizontalPolicy(), model_info_btn.sizePolicy().verticalPolicy())
-        
+
         model_info_btn.adjustSize()
         model_info_btn.setFont(btn_font)
-        
+
         concat_modalities_btn = QPushButton("Concatenate Modalities")
         concat_modalities_btn.clicked.connect(self.init_concat_ui)
-        concat_modalities_btn.setSizePolicy(concat_modalities_btn.sizePolicy().horizontalPolicy(), concat_modalities_btn.sizePolicy().verticalPolicy())
+        concat_modalities_btn.setSizePolicy(
+            concat_modalities_btn.sizePolicy().horizontalPolicy(), concat_modalities_btn.sizePolicy().verticalPolicy()
+        )
         concat_modalities_btn.setMinimumHeight(concat_modalities_btn.sizeHint().height() * 2)
         concat_modalities_btn.setMinimumWidth(concat_modalities_btn.sizeHint().width() * 2)
         concat_modalities_btn.adjustSize()
         concat_modalities_btn.setFont(btn_font)
-        
+
         # Add icon to the Remote Inference button
         with importlib.resources.path("MONet.icons", "Remote.png") as icon_path:
             remote_infer_btn.setIcon(QIcon(str(icon_path)))
@@ -224,11 +247,11 @@ class MAIAInferenceApp(QWidget):
                     widget.setParent(None)
                 elif child_layout is not None:
                     clear_layout(child_layout)
+
         clear_layout(self.layout())
 
-        layout = self.layout() #QVBoxLayout()
+        layout = self.layout()  # QVBoxLayout()
 
-        
         home_button = QPushButton("")
         home_button.setFixedSize(40, 40)
         with importlib.resources.path("MONet.icons", "Home-icon.svg.png") as icon_path:
@@ -295,10 +318,11 @@ class MAIAInferenceApp(QWidget):
                     widget.setParent(None)
                 elif child_layout is not None:
                     clear_layout(child_layout)
+
         clear_layout(self.layout())
 
-        layout = self.layout() #QVBoxLayout()
-        
+        layout = self.layout()  # QVBoxLayout()
+
         home_button = QPushButton("")
         home_button.setFixedSize(40, 40)
         with importlib.resources.path("MONet.icons", "Home-icon.svg.png") as icon_path:
@@ -352,16 +376,23 @@ class MAIAInferenceApp(QWidget):
         layout.addWidget(self.infer_button)
 
         self.setLayout(layout)
-        
+
     def run_local_inference(self):
         try:
             from MONet_scripts.MONet_local_inference import run_inference as local_inference_main
-            output_image = local_inference_main(self.model_dropdown.currentText(), self.username, self.input_path_input.text(), self.output_path_input.text())
-            QMessageBox.information(self, "Inference Completed", f"Segmentation saved to {Path(self.output_path_input.text()).joinpath(output_image)}")
+
+            output_image = local_inference_main(
+                self.model_dropdown.currentText(), self.username, self.input_path_input.text(), self.output_path_input.text()
+            )
+            QMessageBox.information(
+                self, "Inference Completed", f"Segmentation saved to {Path(self.output_path_input.text()).joinpath(output_image)}"
+            )
         except ImportError:
-            QMessageBox.critical(self, "Import Error", "Failed to import the local inference function. Please ensure MONet package is installed.")
+            QMessageBox.critical(
+                self, "Import Error", "Failed to import the local inference function. Please ensure MONet package is installed."
+            )
             return
-        
+
     def init_models_info(self):
         if len(self.models.keys()) == 0:
             self.models = get_available_models(self.token, self.username)
@@ -370,10 +401,10 @@ class MAIAInferenceApp(QWidget):
         for model in self.models:
             response = requests.get(f"{self.models[model]}info/", headers={"Authorization": f"Bearer {self.token}"})
             if response.status_code == 200:
-                model_info = response.json()['models']['MONetBundle']
-                labels = ", ".join(model_info.get('labels', []))
-                description = model_info.get('description', '')
-                inputs = ", ".join(model_info.get('metadata', {}).get('inputs', []))
+                model_info = response.json()["models"]["MONetBundle"]
+                labels = ", ".join(model_info.get("labels", []))
+                description = model_info.get("description", "")
+                inputs = ", ".join(model_info.get("metadata", {}).get("inputs", []))
                 model_infos.append((model, labels, description, inputs))
             else:
                 print(f"Failed to retrieve info for model {model}")
@@ -382,7 +413,7 @@ class MAIAInferenceApp(QWidget):
             dialog = QDialog(self)
             dialog.setWindowTitle("Available Models")
             table = QTableWidget(len(model_infos), 4)
-            table.setHorizontalHeaderLabels(["Model","Description", "Inputs", "Labels"])
+            table.setHorizontalHeaderLabels(["Model", "Description", "Inputs", "Labels"])
             for row, (model, labels, description, inputs) in enumerate(model_infos):
                 table.setItem(row, 0, QTableWidgetItem(model))
                 table.setItem(row, 1, QTableWidgetItem(description))
@@ -412,6 +443,7 @@ class MAIAInferenceApp(QWidget):
                     widget.setParent(None)
                 elif child_layout is not None:
                     clear_layout(child_layout)
+
         clear_layout(self.layout())
         layout = self.layout()
 
@@ -465,10 +497,12 @@ class MAIAInferenceApp(QWidget):
                 label = QLabel(f"Input {idx+1} ({channel}):")
                 line_edit = QLineEdit()
                 browse_btn = QPushButton("Browse")
+
                 def browse_file(le):
                     path, _ = QFileDialog.getOpenFileName(self, "Select Input File", "", "NIfTI Files (*.nii.gz)")
                     if path:
                         le.setText(path)
+
                 browse_btn.clicked.connect(lambda _, le=line_edit: browse_file(le))
                 selector_layout.addWidget(label)
                 selector_layout.addWidget(line_edit)
@@ -496,7 +530,7 @@ class MAIAInferenceApp(QWidget):
                 model_metadata = response.json()["models"]["MONetBundle"]["metadata"]
                 required_channels = model_metadata.get("inputs", [])
                 self.ref_modality_dropdown.addItems(required_channels)
-            except Exception as e:
+            except Exception:
                 self.ref_modality_dropdown.addItem("Unknown")
         ref_modality_layout.addWidget(ref_modality_label)
         ref_modality_layout.addWidget(self.ref_modality_dropdown)
@@ -513,8 +547,9 @@ class MAIAInferenceApp(QWidget):
                     model_metadata = response.json()["models"]["MONetBundle"]["metadata"]
                     required_channels = model_metadata.get("inputs", [])
                     self.ref_modality_dropdown.addItems(required_channels)
-                except Exception as e:
+                except Exception:
                     self.ref_modality_dropdown.addItem("Unknown")
+
         self.model_dropdown.currentIndexChanged.connect(update_ref_modality_dropdown)
 
         # Output file selector
@@ -522,10 +557,12 @@ class MAIAInferenceApp(QWidget):
         output_label = QLabel("Output File:")
         self.output_path_input = QLineEdit()
         output_browse_btn = QPushButton("Browse")
+
         def browse_output_file():
             path = QFileDialog.getExistingDirectory(self, "Select Output Folder", "")
             if path:
                 self.output_path_input.setText(path)
+
         output_browse_btn.clicked.connect(browse_output_file)
         output_layout.addWidget(output_label)
         output_layout.addWidget(self.output_path_input)
@@ -537,40 +574,48 @@ class MAIAInferenceApp(QWidget):
         concat_button.setFont(self.infer_button.font())
         concat_button.clicked.connect(self.concatenate_modalities)
         layout.addWidget(concat_button)
+
     def concatenate_modalities(self):
         input_files = []
         for selector in self.input_selectors:
             # Use the stored line_edit attribute
-            line_edit = getattr(selector, 'line_edit', None)
+            line_edit = getattr(selector, "line_edit", None)
             if line_edit is not None:
                 input_files.append(line_edit.text())
             else:
                 input_files.append("")
-        
+
         output_folder = self.output_path_input.text()
 
         reference_modality = self.ref_modality_dropdown.currentText()
-        
+
         modalities = []
         for selector in self.input_selectors:
-            line_edit = getattr(selector, 'line_edit', None)
+            line_edit = getattr(selector, "line_edit", None)
             if line_edit is not None:
                 input_file = line_edit.text()
                 # Get the channel name from the label in the selector layout
                 label = selector.layout().itemAt(0).widget()
-                modality = label.text().split('(')[-1].rstrip('):')
+                modality = label.text().split("(")[-1].rstrip("):")
                 modalities.append(modality)
                 print(f"Input file: {input_file}, Modality: {modality}")
             # Now you have both input_file and modality for each input
         try:
             from MONet_scripts.MONet_concatenate_modalities import concatenate
+
             data = {modality: input_file for modality, input_file in zip(modalities, input_files)}
-            print(f"Concatenating modalities: {data} with reference modality: {reference_modality} to output folder: {output_folder}")
-            QMessageBox.information(self, "Concatenation Started", "Concatenating modalities, please wait...",)
+            print(
+                f"Concatenating modalities: {data} with reference modality: {reference_modality} to output folder: {output_folder}"
+            )
+            QMessageBox.information(self, "Concatenation Started", "Concatenating modalities, please wait...")
             output_file = concatenate(data, reference_modality, output_folder)
-            QMessageBox.information(self, "Success", f"Modalities concatenated and saved to {Path(output_folder).joinpath(output_file)}")
+            QMessageBox.information(
+                self, "Success", f"Modalities concatenated and saved to {Path(output_folder).joinpath(output_file)}"
+            )
         except ImportError:
-            QMessageBox.critical(self, "Import Error", "Failed to import the concatenation function. Please ensure MONet package is installed.")
+            QMessageBox.critical(
+                self, "Import Error", "Failed to import the concatenation function. Please ensure MONet package is installed."
+            )
             return
 
     def browse_input(self):
@@ -587,6 +632,7 @@ class MAIAInferenceApp(QWidget):
         path = QFileDialog.getExistingDirectory(self, "Select Output Folder", "")
         if path:
             self.output_path_input.setText(path)
+
     def run_inference(self):
         input_file = self.input_path_input.text()
         output_file = self.output_path_input.text()
@@ -611,13 +657,17 @@ class MAIAInferenceApp(QWidget):
             num_channels = 1 if len(img.GetSize()) < 4 else img.GetSize()[3]
 
             if num_channels != len(required_channels):
-                QMessageBox.critical(self, "Input Error", f"The model you selected ({model}) expected {len(required_channels)} channels, got {num_channels}.")
+                QMessageBox.critical(
+                    self,
+                    "Input Error",
+                    f"The model you selected ({model}) expected {len(required_channels)} channels, got {num_channels}.",
+                )
                 return
 
             with open(input_file, "rb") as f:
                 files = {
                     "params": (None, json.dumps({}, indent=2), "application/json"),
-                    "file": (os.path.basename(input_file), f, "application/gzip")
+                    "file": (os.path.basename(input_file), f, "application/gzip"),
                 }
                 res = requests.post(infer_url, headers=headers, files=files)
                 res.raise_for_status()
@@ -631,7 +681,7 @@ class MAIAInferenceApp(QWidget):
 
 
 def main():
-    
+
     app = QApplication(sys.argv)
     window = MAIAInferenceApp()
     with importlib.resources.path("MONet.icons", "logo.svg") as icon_path:
@@ -639,6 +689,7 @@ def main():
         window.setWindowIcon(QIcon(str(icon_path)))
     window.show()
     sys.exit(app.exec_())
+
 
 if __name__ == "__main__":
     main()

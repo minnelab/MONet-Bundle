@@ -4,10 +4,11 @@ from __future__ import annotations
 import argparse
 import json
 import os
+from pathlib import Path
 
 import requests
 import SimpleITK as sitk
-from pathlib import Path
+
 from MONet.utils import get_available_models
 
 try:
@@ -68,14 +69,13 @@ def run_inference(model_name: str, username: str, input_image: str, output_folde
         with open(model_path, "wb") as f:
             f.write(response.content)
 
-
     extra_files = {"inference.json": "", "metadata.json": ""}
     model = torch.jit.load(model_path, _extra_files=extra_files)
 
     inference = json.loads(extra_files["inference.json"])
     metadata = json.loads(extra_files["metadata.json"])
-    
-    model_metadata = metadata['network_data_format']
+
+    model_metadata = metadata["network_data_format"]
     required_input_channels = model_metadata["inputs"]
     print(f"Required input channels: {len(required_input_channels)}")
     for idx, channel in enumerate(required_input_channels):
@@ -126,7 +126,8 @@ def run_inference(model_name: str, username: str, input_image: str, output_folde
 
     # Save the prediction
     SaveImage(output_dir=output_folder, separate_folder=False, output_postfix="segmentation", output_ext=".nii.gz")(pred[0])
-    return Path(input_image).name[:-len(".nii.gz")] + "_segmentation.nii.gz"
+    return Path(input_image).name[: -len(".nii.gz")] + "_segmentation.nii.gz"
+
 
 def main():
     parser = get_arg_parser()

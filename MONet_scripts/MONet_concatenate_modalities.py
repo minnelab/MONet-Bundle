@@ -114,7 +114,7 @@ def concatenate(data: Dict[str, Any], ref_modality: str, output_folder: str) -> 
     concatenate = ConcatItemsd(keys=list(modalities), name="image")
     formatter = NIFTINameFormatter(suffix=suffix)
     save = SaveImage(output_dir=output_folder, output_name_formatter=formatter, output_postfix="image", separate_folder=False)
-    
+
     for modality, filename in zip(modalities, filenames):
         data[modality] = load(filename)
     for modality in modalities:
@@ -131,9 +131,7 @@ def concatenate(data: Dict[str, Any], ref_modality: str, output_folder: str) -> 
                 target_affine_4x4 = data[ref_modality].meta["affine"]
 
             data[modality].meta["pixdim"] = data[ref_modality].meta["pixdim"]
-            data[modality] = resample(
-                data[modality], dst_affine=target_affine_4x4, spatial_size=data[ref_modality].shape[1:]
-            )
+            data[modality] = resample(data[modality], dst_affine=target_affine_4x4, spatial_size=data[ref_modality].shape[1:])
     data = concatenate(data)["image"]
     save(data)
     return filenames[0][: -len(suffix)] + "_image.nii.gz"
