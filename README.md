@@ -59,7 +59,7 @@ For testing purposes, you can use the `Task09_Spleen.zip` file provided in this 
 Next, you can build the provided Docker image to convert the model to MONAI Bundle format. The Dockerfile is provided in this repository, and you can build the image with the following command:
 
 ```bash
-docker build -t nnunet-monai-bundle-converter .
+docker build -t monet-bundle-converter .
 ```
 The converter will first convert the nnUNet model to MONAI Bundle format, and then create the corresponding TorchScript model, which can be used for inference with MONAI Deploy.
 For testing purposes, you can use the `Task09_Spleen.zip` file provided in this repository.
@@ -67,8 +67,13 @@ For testing purposes, you can use the `Task09_Spleen.zip` file provided in this 
 To run the conversion, you can use the following command:
 ```bash
 wget https://github.com/SimoneBendazzoli93/MONet-Bundle/releases/download/v1.0/Task09_Spleen.zip
-python MONet_run_conversion.py --bundle_path <MONAI_BUNDLE_PATH> --nnunet_model <NNUNET_CHECKPOINT_PATH>.zip
+MONet_run_conversion --bundle_path <MONAI_BUNDLE_PATH> --nnunet_model <NNUNET_CHECKPOINT_PATH>.zip --dataset_name_or_id <DATASET_NAME_OR_ID> --metadata_file <CUSTOM_METADATA_FILE>
 ```
+Where:
+- `<MONAI_BUNDLE_PATH>` is the path where you want to save the MONet Bundle.
+- `<NNUNET_CHECKPOINT_PATH>` is the path to the nnUNet model checkpoint file (e.g., `Task09_Spleen.zip`).
+- `<DATASET_NAME_OR_ID>` is the name or ID of the dataset to convert (e.g., `09`).
+- `<CUSTOM_METADATA_FILE>` is the path to a custom metadata file for the bundle.
 
 ## Package the MONet Bundle with MONAI Deploy
 To package the MONet Bundle with MONAI Deploy, you can use the `monai-deploy package` command. This command will create a deployable bundle that can be used for inference with MONAI Deploy.
@@ -82,14 +87,14 @@ monai-deploy package examples/apps/spleen_nnunet_seg_app -c examples/apps/spleen
 The resulting Docker context can be found in the `deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0` directory. You can use this context to build a Docker image that can be used for inference with MONAI Deploy:
 ```bash
 # Copy the TorchScript model to the Docker context
-cp nnUNetBundle/models/fold_0/model.ts deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0/models/model/
+cp MONetBundle/models/fold_0/model.ts deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0/models/model/
 
 docker build deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0 --build-arg UID=1000 --build-arg GID=1000 --build-arg UNAME=holoscan -f deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0/Dockerfile -t spleen-x64-workstation-dgpu-linux-amd64:1.0
 ```
 
 To test the resulting Docker image, you can run:
 ```bash
-MONet_inference_dicom.py --dicom_study_folder <INPUT_FOLDER> --prediction_output_folder <OUTPUT_DIR> --docker-image maiacloud/spleen-x64-workstation-dgpu-linux-amd64:1.0
+MONet_inference_dicom --dicom_study_folder <INPUT_FOLDER> --prediction_output_folder <OUTPUT_DIR> --docker-image maiacloud/spleen-x64-workstation-dgpu-linux-amd64:1.0
 ```
 Specifying the input and output folders, together with the TorchScript model path.
 The input folder should contain all the DICOM files of the study you want to process, and the output folder will contain the predictions in DICOM SEG format, and an additional STL file with the 3D mesh of the segmentation.
@@ -99,7 +104,14 @@ The input folder should contain all the DICOM files of the study you want to pro
 To create the same Docker image running inference on NIFTI images, you can use the provided `Dockerfile` in the `deploy/spleen-x64-workstation-dgpu-linux-amd64:1.0-nifti` directory. The Dockerfile is already set up to run inference on NIfTI images, and it includes the necessary dependencies.
 To test the resulting Docker image, you can run:
 ```bash
-MONet_inference_nifti.py --study_folder <INPUT_FOLDER> --prediction_output_folder <OUTPUT_DIR> --docker-image maiacloud/spleen-x64-workstation-dgpu-linux-amd64:1.0-nifti
+MONet_inference_nifti --study_folder <INPUT_FOLDER> --prediction_output_folder <OUTPUT_DIR> --docker-image maiacloud/spleen-x64-workstation-dgpu-linux-amd64:1.0-nifti
 ```
 Specifying the input and output folders, together with the TorchScript model path.
 The input folder should contain all the NIfTI files of the study you want to process (one per modality, with the given suffix identifier), and the output folder will contain the predictions in NIfTI format.
+
+## Run MONAI Label server with MONet Bundle
+To run a MONAI Label server with the MONet Bundle, you can use the `MONet_MONAI_Label.py` script provided in this repository. This script will run a MONAI Label server with the MONet Bundle model, allowing you to interactively segment medical images using the trained model.
+You can run the script with the following command:
+```bash
+MONet_MONAI_Label --docker-image spleen-x64-workstation-dgpu-linux-amd64:1.0-label --model_folder MONetBundle/models/fold_0
+```

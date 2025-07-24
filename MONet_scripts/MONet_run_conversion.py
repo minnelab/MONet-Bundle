@@ -8,6 +8,8 @@ except ImportError:
 
 
 import os
+import shutil
+import subprocess
 import zipfile
 
 
@@ -20,6 +22,7 @@ def get_arg_parser():
         "--nnunet_model", type=str, required=True, help="Path to the nnUNet model checkpoint file (e.g., Task09_Spleen.zip)."
     )
     parser.add_argument("--dataset_name_or_id", type=str, required=True, help="Name or ID of the dataset to convert.")
+    parser.add_argument("--metadata_file", type=str, default=None, help="Path to the metadata file for the bundle.")
 
     return parser
 
@@ -37,8 +40,13 @@ def main():
     with zipfile.ZipFile(args.nnunet_model, "r") as zip_ref:
         zip_ref.extractall("nnUNet_Models")
 
+    subprocess.run(["MONet_fetch_bundle", "--bundle_path", bundle_path], check=True)
+    if not os.path.isabs(bundle_path):
+        bundle_path = os.path.abspath(bundle_path)
+    bundle_path = os.path.join(bundle_path, "MONetBundle")
+    shutil.copy(args.metadata_file, os.path.join(bundle_path, "configs", "metadata.json"))
     docker.run(
-        "nnunet-monai-bundle-converter",
+        "monet-bundle-converter",
         gpus="device=0",
         envs={"nnUNet_results": "/input"},
         command=["--fold", "0", "--bundle_root", "/model/bundle", "--dataset_name_or_id", args.dataset_name_or_id],
