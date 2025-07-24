@@ -1,0 +1,7 @@
+git+https://github.com/SimoneBendazzoli93/dynamic-network-architectures.git
+git+https://github.com/SimoneBendazzoli93/nnUNet.git
+git+https://github.com/SimoneBendazzoli93/MONAI.git@dev
+nvflare
+mlflow
+lightning
+#batchgenerators==0.25

@@ -1,16 +1,14 @@
 FROM nvcr.io/nvidia/pytorch:24.05-py3
 
 #RUN ltt install torch==2.4.0
+RUN pip install git+https://github.com/SimoneBendazzoli93/dynamic-network-architectures.git
+RUN pip install git+https://github.com/SimoneBendazzoli93/nnUNet.git
+RUN pip install git+https://github.com/SimoneBendazzoli93/MONAI.git@dev
+RUN pip install monet-bundle
 
-COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
 
 WORKDIR /workspace
-COPY MONet_scripts/convert_nnunet_checkpoint_to_bundle_checkpoint.py .
-RUN chmod +x convert_nnunet_checkpoint_to_bundle_checkpoint.py
 
-COPY MONet_scripts/convert_ckpt_to_ts.py .
-RUN chmod +x convert_ckpt_to_ts.py
 COPY run.sh .
 
 ENTRYPOINT ["/bin/bash", "run.sh"]
