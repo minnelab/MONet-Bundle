@@ -179,8 +179,7 @@ class MAIAInferenceApp(QWidget):
         remote_infer_btn.setSizePolicy(
             remote_infer_btn.sizePolicy().horizontalPolicy(), remote_infer_btn.sizePolicy().verticalPolicy()
         )
-        # Double the normal size
-        remote_infer_btn.setMinimumHeight(remote_infer_btn.sizeHint().height() * 2)
+
         remote_infer_btn.setMinimumWidth(remote_infer_btn.sizeHint().width() * 2)
         remote_infer_btn.adjustSize()
         # Set custom font for button text
@@ -216,6 +215,26 @@ class MAIAInferenceApp(QWidget):
         concat_modalities_btn.adjustSize()
         concat_modalities_btn.setFont(btn_font)
 
+        
+        button_height = remote_infer_btn.sizeHint().height() * 2
+        button_width = remote_infer_btn.sizeHint().width() * 2
+
+        remote_infer_btn.setMinimumHeight(button_height)
+        remote_infer_btn.setMinimumWidth(button_width)
+        remote_infer_btn.adjustSize()
+
+        local_infer_btn.setMinimumHeight(button_height)
+        local_infer_btn.setMinimumWidth(button_width)
+        local_infer_btn.adjustSize()
+
+        model_info_btn.setMinimumHeight(button_height)
+        model_info_btn.setMinimumWidth(button_width)
+        model_info_btn.adjustSize()
+
+        concat_modalities_btn.setMinimumHeight(button_height)
+        concat_modalities_btn.setMinimumWidth(button_width)
+        concat_modalities_btn.adjustSize()
+        
         # Add icon to the Remote Inference button
         with importlib.resources.path("MONet.icons", "Remote.png") as icon_path:
             remote_infer_btn.setIcon(QIcon(str(icon_path)))
@@ -228,6 +247,11 @@ class MAIAInferenceApp(QWidget):
             local_infer_btn.setIconSize(local_infer_btn.size())
             local_infer_btn.setStyleSheet("text-align: left; padding-left: 40px;")  # Align icon left, add padding for text
         layout.addWidget(local_infer_btn)
+        
+        with importlib.resources.path("MONet.icons", "Models.png") as icon_path:
+            model_info_btn.setIcon(QIcon(str(icon_path)))
+            model_info_btn.setIconSize(model_info_btn.size())
+            model_info_btn.setStyleSheet("text-align: left; padding-left: 40px;")  # Align icon left, add padding for text
         layout.addWidget(model_info_btn)
         with importlib.resources.path("MONet.icons", "Concatenate.png") as icon_path:
             concat_modalities_btn.setIcon(QIcon(str(icon_path)))
