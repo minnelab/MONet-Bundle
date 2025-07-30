@@ -6,6 +6,13 @@ The single models are deployed and made available as single MONAI Label server a
 The **MAIA Segmentation Portal** is running as a KubeFlow-based project, so it is possible to run inference on the models from the KubeFlow UI.
 If you want to create your own MONet-based model, we provide instructions on how to run the training, starting from your annotated data, either locally or with KubeFlow, using the MONet Bundle format.
 
+## GUI Installation
+To start using the MAIA Segmentation Portal, you can install the GUI application.
+The GUI application is available for Windows and Linux.
+
+Download the Windows version of the MAIA Segmentation Portal from [here](https://github.com/SimoneBendazzoli93/MONet-Bundle/releases/download/v1.1.6/MAIA_Segmentation_Portal.exe)
+or the Linux version from [here](https://github.com/SimoneBendazzoli93/MONet-Bundle/releases/download/v1.1.6/MAIA_Segmentation_Portal_Linux)
+
 ## Installation
 To install the MAIA Segmentation Portal Python API:
 ```bash
