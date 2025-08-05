@@ -106,7 +106,7 @@ def concatenate(data: Dict[str, Any], ref_modality: str, output_folder: str) -> 
     elif "-" in base:
         suffix = "-" + base.split("-")[-1]
     else:
-        suffix = ""
+        suffix = ".nii.gz"
     load = Compose(
         [LoadImage(), EnsureChannelFirst()]
     )  # LoadImage will handle NIfTI files and EnsureChannelFirst ensures the channel dimension is first
