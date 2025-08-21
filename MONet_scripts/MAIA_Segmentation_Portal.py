@@ -28,7 +28,7 @@ from PyQt5.QtWidgets import (
 
 from MONet.auth import get_token, verify_valid_token_exists, welcome_message
 from MONet.utils import get_available_models
-
+from MONet_scripts.MONet_remote_inference import run_dicom_inference
 
 class MAIAInferenceApp(QWidget):
     def __init__(self):
@@ -53,6 +53,8 @@ class MAIAInferenceApp(QWidget):
             if auth_files:
                 print("Found auth files:", auth_files)
                 self.username = auth_files[0].replace("_auth.json", "")
+            else:
+                self.username = ""
         except Exception:
             self.username = ""
 
@@ -643,7 +645,9 @@ class MAIAInferenceApp(QWidget):
             return
 
     def browse_input(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Select Input File", "", "NIfTI Files (*.nii.gz)")
+        path, _ = QFileDialog.getOpenFileName(self, "Select Input File", "", "NIfTI Files (*.nii.gz);;All Files (*)")
+        if not path:
+            path = QFileDialog.getExistingDirectory(self, "Select Input Directory", "")
         if path:
             self.input_path_input.setText(path)
 
@@ -664,6 +668,13 @@ class MAIAInferenceApp(QWidget):
 
         if not all([input_file, output_file, model]):
             QMessageBox.warning(self, "Missing Fields", "Please complete all fields.")
+            return
+        
+        if Path(input_file).is_dir():
+            run_dicom_inference(input_file, output_file, model, self.username)
+            return
+        elif not Path(input_file).is_file():
+            run_dicom_inference(input_file, output_file, model, self.username)
             return
 
         base_url = self.models[model]
