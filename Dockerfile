@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/pytorch:24.05-py3
+FROM nvcr.io/nvidia/pytorch:25.02-py3
 
 #RUN ltt install torch==2.4.0
 RUN pip install git+https://github.com/SimoneBendazzoli93/dynamic-network-architectures.git

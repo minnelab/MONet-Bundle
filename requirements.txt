@@ -7,3 +7,5 @@ python-on-whales
 SimpleITK
 PyQt5
 requests
+pynetdicom
+pydicom
