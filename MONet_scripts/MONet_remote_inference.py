@@ -12,7 +12,7 @@ from pathlib import Path
 import subprocess
 import pydicom
 from MONet.utils import get_available_models
-
+from pynetdicom.apps.storescu.storescu import main as storescu_main
 
 def run_dicom_inference(input_path, output_path, model, username):
     # Find the first .dcm file in input_path or its subdirectories using pydicom
@@ -36,7 +36,7 @@ def run_dicom_inference(input_path, output_path, model, username):
         studyInstanceUID = ds.get('StudyInstanceUID', 'Unknown')
         print(f"Study Instance UID: {studyInstanceUID}")
         print(f"Patient ID: {ds.get('PatientID', 'Unknown')}")
-        #subprocess.run(["python", "-m", "pynetdicom", "storescu","-r", "maia-small.cloud.cbh.kth.se", "30015", input_path])
+        subprocess.run(["python", "-m", "pynetdicom", "storescu","-r", "localhost", "30015", input_path])
     home = os.path.expanduser("~")
     auth_path = os.path.join(home, ".monet", f"{username}_auth.json")
     with open(auth_path, "r") as token_file:
@@ -90,7 +90,7 @@ def run_dicom_inference(input_path, output_path, model, username):
     else:
         print(f"Request failed [{response.status_code}]: {response.text}")
     # You can now process dcm_files as needed
-    subprocess.run(["python", "-m", "pynetdicom", "storescu", "maia-small.cloud.cbh.kth.se", "30015", output_path])
+    storescu_main(["storescu","localhost", "30015", output_path])
 
 def run_inference(input_path, output_path, model, username):
     if Path(input_path).is_dir():
