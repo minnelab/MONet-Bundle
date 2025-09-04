@@ -13,6 +13,7 @@ import logging
 from pathlib import Path
 
 from pydicom.sr.codedict import codes
+from pydicom.sr.codedict import Code
 
 from monai.deploy.conditions import CountCondition
 from monai.deploy.core import AppContext, Application
@@ -25,27 +26,14 @@ from monai.deploy.operators.dicom_series_to_volume_operator import DICOMSeriesTo
 from monai.deploy.operators.monai_bundle_inference_operator import BundleConfigNames, IOMapping
 from monai.deploy.operators.monet_bundle_inference_operator import MONetBundleInferenceOperator
 from monai.deploy.operators.stl_conversion_operator import STLConversionOperator
-
+import os
+import yaml
 
 # @resource(cpu=1, gpu=1, memory="7Gi")
 # pip_packages can be a string that is a path(str) to requirements.txt file or a list of packages.
 # The monai pkg is not required by this class, instead by the included operators.
-class AISpleenMONetSegApp(Application):
-    """Demonstrates inference with built-in MONet Bundle inference operator with DICOM files as input/output
-
-    This application loads a set of DICOM instances, select the appropriate series, converts the series to
-    3D volume image, performs inference with the built-in MONet Bundle inference operator, including nnUNet resampling,pre-processing
-    and post-processing, save the segmentation image in a DICOM Seg OID in an instance file, and optionally the
-    surface mesh in STL format.
-
-    Pertinent nnUNet MONAI Bundle:
-      <Upload to the MONAI Model Zoo>
-
-    Execution Time Estimate:
-      With a Nvidia RTXA600 48GB GPU, for an input DICOM Series of size 106x415x415 and patches of size 64x192x160, the execution time is around
-      50 seconds with saving both DICOM Seg and surface mesh STL file.
-    """
-
+class AIMONetSegApp(Application):
+    
     def __init__(self, *args, **kwargs):
         """Creates an application instance."""
         self._logger = logging.getLogger("{}.{}".format(__name__, type(self).__name__))
@@ -71,41 +59,54 @@ class AISpleenMONetSegApp(Application):
         study_loader_op = DICOMDataLoaderOperator(
             self, CountCondition(self, 1), input_folder=app_input_path, name="study_loader_op"
         )
-        series_selector_op = DICOMSeriesSelectorOperator(self, rules=Sample_Rules_Text, name="series_selector_op")
-        series_to_vol_op = DICOMSeriesToVolumeOperator(self, name="series_to_vol_op")
+        
+        segmentation_task_params = None
+        with open(os.environ["SEGMENTATION_TASK_CONFIG_FILE"],"r") as f:
+            segmentation_task_params = yaml.safe_load(f)["tasks"]
 
-        # Create the inference operator that supports MONAI Bundle and automates the inference.
-        # The IOMapping labels match the input and prediction keys in the pre and post processing.
-        # The model_name is optional when the app has only one model.
-        # The bundle_path argument optionally can be set to an accessible bundle file path in the dev
-        # environment, so when the app is packaged into a MAP, the operator can complete the bundle parsing
-        # during init.
+        input_mapping = []
+        ref_modality = "image"
+        series_selector_ops = {}
+        series_to_vol_ops = {}
+        for modality in segmentation_task_params[os.environ["SEGMENTATION_TASK_NAME"]]["Modalities"]:
+            series_selector_ops[modality] = DICOMSeriesSelectorOperator(self, rules=segmentation_task_params[os.environ["SEGMENTATION_TASK_NAME"]]["Modalities"][modality]["Rules_Text"], name=f"{modality.lower()}_series_selector_op")
+            series_to_vol_ops[modality] = DICOMSeriesToVolumeOperator(self, name=f"{modality.lower()}_series_to_vol_op")
+            input_mapping.append(IOMapping(modality, Image, IOType.IN_MEMORY))
+
+        if "Reference_Modality" in segmentation_task_params[os.environ["SEGMENTATION_TASK_NAME"]]:
+            ref_modality = segmentation_task_params[os.environ["SEGMENTATION_TASK_NAME"]]["Reference_Modality"]
+
 
         config_names = BundleConfigNames(config_names=["inference"])  # Same as the default
 
-        bundle_spleen_seg_op = MONetBundleInferenceOperator(
+        bundle_seg_op = MONetBundleInferenceOperator(
             self,
-            input_mapping=[IOMapping("image", Image, IOType.IN_MEMORY)],
+            input_mapping=input_mapping,
             output_mapping=[IOMapping("pred", Image, IOType.IN_MEMORY)],
             app_context=app_context,
+            ref_modality=ref_modality,
             bundle_config_names=config_names,
-            name="monet_bundle_spleen_seg_op",
+            name="monet_bundle_seg_op",
         )
 
         # Create DICOM Seg writer providing the required segment description for each segment with
         # the actual algorithm and the pertinent organ/tissue. The segment_label, algorithm_name,
         # and algorithm_version are of DICOM VR LO type, limited to 64 chars.
         # https://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html
-        segment_descriptions = [
-            SegmentDescription(
-                segment_label="Spleen",
-                segmented_property_category=codes.SCT.Organ,
-                segmented_property_type=codes.SCT.Spleen,
-                algorithm_name="volumetric (3D) segmentation of the spleen from CT image",
+        segment_descriptions = []
+        
+        for segment in segmentation_task_params[os.environ["SEGMENTATION_TASK_NAME"]]["Segments"]:
+            segment_descriptions.append(
+                SegmentDescription(
+                    segment_label=segment["segment_label"],
+                    segmented_property_category=Code(segment["segmented_property_category"]["code"], segment["segmented_property_category"]["scheme"], segment["segmented_property_category"]["meaning"]),
+                    segmented_property_type=Code(segment["segmented_property_type"]["code"], segment["segmented_property_type"]["scheme"], segment["segmented_property_type"]["meaning"]),
+                algorithm_name=segment["algorithm_name"],
                 algorithm_family=codes.DCM.ArtificialIntelligence,
                 algorithm_version="0.3.2",
+            ),
             )
-        ]
+            
 
         custom_tags = {"SeriesDescription": "AI generated Seg, not for clinical use."}
 
@@ -116,48 +117,35 @@ class AISpleenMONetSegApp(Application):
             output_folder=app_output_path,
             name="dicom_seg_writer",
         )
+        
+        
 
-        # Create the processing pipeline, by specifying the source and destination operators, and
-        # ensuring the output from the former matches the input of the latter, in both name and type.
-        self.add_flow(study_loader_op, series_selector_op, {("dicom_study_list", "dicom_study_list")})
-        self.add_flow(
-            series_selector_op, series_to_vol_op, {("study_selected_series_list", "study_selected_series_list")}
-        )
-        self.add_flow(series_to_vol_op, bundle_spleen_seg_op, {("image", "image")})
-        # Note below the dicom_seg_writer requires two inputs, each coming from a source operator.
-        self.add_flow(
-            series_selector_op, dicom_seg_writer, {("study_selected_series_list", "study_selected_series_list")}
-        )
-        self.add_flow(bundle_spleen_seg_op, dicom_seg_writer, {("pred", "seg_image")})
+        for modality in segmentation_task_params[os.environ["SEGMENTATION_TASK_NAME"]]["Modalities"]:
+            self.add_flow(study_loader_op, series_selector_ops[modality], {("dicom_study_list", "dicom_study_list")})
+            self.add_flow(series_selector_ops[modality], series_to_vol_ops[modality], {("study_selected_series_list", "study_selected_series_list")})
+            self.add_flow(series_to_vol_ops[modality], bundle_seg_op, {("image", modality)})
+          
+
+        if ref_modality is not "image":
+            self.add_flow(
+                series_selector_ops[ref_modality], dicom_seg_writer, {("study_selected_series_list", "study_selected_series_list")}
+            )
+        else:
+            self.add_flow(
+                series_selector_ops["image"], dicom_seg_writer, {("study_selected_series_list", "study_selected_series_list")}
+            )
+        self.add_flow(bundle_seg_op, dicom_seg_writer, {("pred", "seg_image")})
         # Create the surface mesh STL conversion operator and add it to the app execution flow, if needed, by
         # uncommenting the following couple lines.
-        stl_conversion_op = STLConversionOperator(
-            self, output_file=app_output_path.joinpath("stl/spleen.stl"), name="stl_conversion_op"
-        )
-        self.add_flow(bundle_spleen_seg_op, stl_conversion_op, {("pred", "image")})
+        #stl_conversion_op = STLConversionOperator(
+        #    self, output_file=app_output_path.joinpath("stl/brain_lesion.stl"), name="stl_conversion_op"
+        #)
+        #self.add_flow(bundle_brats_seg_op, stl_conversion_op, {("pred", "image")})
 
         logging.info(f"End {self.compose.__name__}")
-
-
-# This is a sample series selection rule in JSON, simply selecting CT series.
-# If the study has more than 1 CT series, then all of them will be selected.
-# Please see more detail in DICOMSeriesSelectorOperator.
-Sample_Rules_Text = """
-{
-    "selections": [
-        {
-            "name": "CT Series",
-            "conditions": {
-                "StudyDescription": "(.*?)",
-                "Modality": "(?i)CT",
-                "SeriesDescription": "(.*?)"
-            }
-        }
-    ]
-}
-"""
+        
 
 if __name__ == "__main__":
     logging.info(f"Begin {__name__}")
-    AISpleenMONetSegApp().run()
+    AIMONetSegApp().run()
     logging.info(f"End {__name__}")

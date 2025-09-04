@@ -11,9 +11,9 @@
 
 import logging
 
-from app import AISpleenMONetSegApp
+from app import AIMONetSegApp
 
 if __name__ == "__main__":
     logging.info(f"Begin {__name__}")
-    AISpleenMONetSegApp().run()
+    AIMONetSegApp().run()
     logging.info(f"End {__name__}")
