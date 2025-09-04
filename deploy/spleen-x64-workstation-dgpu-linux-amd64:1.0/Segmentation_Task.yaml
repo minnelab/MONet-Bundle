@@ -1,0 +1,121 @@
+tasks:
+  Spleen:
+    Modalities:
+      image:
+        Rules_Text: |
+          {
+              "selections": [
+                  {
+                      "name": "CT Series",
+                      "conditions": {
+                          "StudyDescription": "(.*?)",
+                          "Modality": "(?i)CT",
+                          "SeriesDescription": "(.*?)"
+                      }
+                  }
+              ]
+          }
+    Segments:
+      - segment_label: "Spleen"
+        segmented_property_category:
+          code: "91772007"
+          scheme: "SCT"
+          meaning: "Organ"
+        segmented_property_type:
+          code: "78961009"
+          scheme: "SCT"
+          meaning: "Spleen"
+        algorithm_name: "MAIA_Segmentation-Spleen"
+  BraTS:
+    Reference_Modality: T1C
+    Modalities:
+      T1C:
+        Rules_Text: |
+                    {
+                        "selections": [
+                            {
+                                "name": "MR Series",
+                                "conditions": {
+                                    "StudyDescription": "(.*?)",
+                                    "Modality": "(?i)MR",
+                                    "SeriesDescription": "T1C"
+                                }
+                            }
+                        ]
+                    }
+                  
+      T1N:
+        Rules_Text: |
+                    {
+                        "selections": [
+                            {
+                                "name": "MR Series",
+                                "conditions": {
+                                    "StudyDescription": "(.*?)",
+                                    "Modality": "(?i)MR",
+                                    "SeriesDescription": "T1N"
+                                }
+                            }
+                        ]
+                    }
+
+      T2F:
+        Rules_Text: |
+                    {
+                        "selections": [
+                            {
+                                "name": "MR Series",
+                                "conditions": {
+                                    "StudyDescription": "(.*?)",
+                                    "Modality": "(?i)MR",
+                                    "SeriesDescription": "T2F"
+                                }
+                            }
+                        ]
+                    }
+
+      T2W:
+        Rules_Text: |
+                    {
+                        "selections": [
+                            {
+                                "name": "MR Series",
+                                "conditions": {
+                                    "StudyDescription": "(.*?)",
+                                    "Modality": "(?i)MR",
+                                    "SeriesDescription": "T2W"
+                                }
+                            }
+                        ]
+                    }
+    Segments:
+      - segment_label: "Enhancing_Tissue"
+        segmented_property_category:
+          code: "52988006"
+          scheme: "SCT"
+          meaning: "Lesion"
+        segmented_property_type:
+          code: "C113842"
+          scheme: "NCIt"
+          meaning: "Enhancing Lesion"
+        algorithm_name: "MAIA_Segmentation-BraTS-GoAT"
+      - segment_label: "Non_Enhancing_Tumor_Core"
+        segmented_property_category:
+          code: "52988006"
+          scheme: "SCT"
+          meaning: "Lesion"
+        segmented_property_type:
+          code: "C81175"
+          scheme: "NCIt"
+          meaning: "Non-Enhancing Lesion"
+        algorithm_name: "MAIA_Segmentation-BraTS-GoAT"
+      - segment_label: "Surrounding_Non_Enhancing_FLAIR_Hyperintensity"
+        segmented_property_category:
+          code: "52988006"
+          scheme: "SCT"
+          meaning: "Lesion"
+        segmented_property_type:
+          code: "79654002"
+          scheme: "SCT"
+          meaning: "Edema"
+        algorithm_name: "MAIA_Segmentation-BraTS-GoAT"
