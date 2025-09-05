@@ -35,7 +35,7 @@ ENV NODE_VERSION=18
 ENV PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
 
-RUN git clone https://github.com/SimoneBendazzoli93/MONAILabel.git && cd MONAILabel && git checkout 59cbf37caff05cba5278f3e9c4ee9b0113456b17
+RUN git clone https://github.com/SimoneBendazzoli93/MONAILabel.git && cd MONAILabel && git checkout 1bae4bdd3f17413ca38384c749b993111235ec3d
 
 RUN export NVM_DIR=/root/.nvm && \
     source $NVM_DIR/nvm.sh && \

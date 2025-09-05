@@ -58,7 +58,7 @@ RUN mkdir -p /etc/holoscan/ \
         && mkdir -p /var/holoscan/output
 
 LABEL base="nvcr.io/nvidia/cuda:12.6.0-runtime-ubuntu22.04"
-LABEL tag="spleen:1.0"
+LABEL tag="monet:1.0"
 LABEL org.opencontainers.image.title="MONAI Deploy App Package - Spleen NIFTI nnUNet Seg Inference"
 LABEL org.opencontainers.image.version="1.0"
 LABEL org.nvidia.holoscan="3.1.0"
@@ -138,8 +138,18 @@ RUN pip install --no-cache-dir --user -r /tmp/requirements.txt
 
 # Install MONAI Deploy from PyPI org
 # RUN pip install monai-deploy-app-sdk==2.0.0
-RUN pip install git+https://github.com/SimoneBendazzoli93/monai-deploy-app-sdk.git@934625bb123d1d8820fb70289da38930baa151a5
+RUN pip install git+https://github.com/SimoneBendazzoli93/monai-deploy-app-sdk.git@9e0bb0fc446d585dfadbf065b90331d403716722
 
+ARG CACHE_BREAKER=1
+RUN echo "Cache breaker: $CACHE_BREAKER"
+
+RUN pip install --upgrade pip setuptools wheel
+
+USER root
+RUN apt-get install python3-distutils
+RUN apt-get install python3-setuptools
+
+USER $UNAME
 COPY ./models  /opt/holoscan/models
 
 

@@ -2,6 +2,7 @@ tasks:
   Spleen:
     Modalities:
       image:
+        File_Pattern: ".nii.gz"
         Rules_Text: |
           {
               "selections": [
@@ -30,6 +31,7 @@ tasks:
     Reference_Modality: T1C
     Modalities:
       T1C:
+        File_Pattern: "-t1c.nii.gz"
         Rules_Text: |
                     {
                         "selections": [
@@ -45,6 +47,7 @@ tasks:
                     }
                   
       T1N:
+        File_Pattern: "-t1n.nii.gz"
         Rules_Text: |
                     {
                         "selections": [
@@ -60,6 +63,7 @@ tasks:
                     }
 
       T2F:
+        File_Pattern: "-t2f.nii.gz"
         Rules_Text: |
                     {
                         "selections": [
@@ -75,6 +79,7 @@ tasks:
                     }
 
       T2W:
+        File_Pattern: "-t2w.nii.gz"
         Rules_Text: |
                     {
                         "selections": [

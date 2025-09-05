@@ -20,26 +20,15 @@ from monai.deploy.operators.monai_bundle_inference_operator import BundleConfigN
 from monai.deploy.operators.monet_bundle_inference_operator import MONetBundleInferenceOperator
 from monai.deploy.operators.nii_data_loader_operator import NiftiDataLoader
 from monai.deploy.operators.nii_data_writer_operator import NiftiDataWriter
-
+import os
+import yaml
 
 # @resource(cpu=1, gpu=1, memory="7Gi")
 # pip_packages can be a string that is a path(str) to requirements.txt file or a list of packages.
 # The monai pkg is not required by this class, instead by the included operators.
-class AISpleenNIFTIMONetSegApp(Application):
-    """Demonstrates inference with built-in MONAI nnUNet Bundle inference operator with DICOM files as input/output
 
-    This application loads a set of DICOM instances, select the appropriate series, converts the series to
-    3D volume image, performs inference with the built-in MONAI nnUNet Bundle inference operator, including pre-processing
-    and post-processing, save the segmentation image in a DICOM Seg OID in an instance file, and optionally the
-    surface mesh in STL format.
 
-    Pertinent nnUNet MONAI Bundle:
-      <Upload to the MONAI Model Zoo>
-
-    Execution Time Estimate:
-      With a Nvidia RTXA600 48GB GPU, for an input DICOM Series of 139 instances, the execution time is around
-      75 seconds with saving both DICOM Seg and surface mesh STL file.
-    """
+class AINIFTIMONetSegApp(Application):
 
     def __init__(self, *args, **kwargs):
         """Creates an application instance."""
@@ -62,10 +51,21 @@ class AISpleenNIFTIMONetSegApp(Application):
         app_input_path = Path(app_context.input_path)
         app_output_path = Path(app_context.output_path)
 
+        segmentation_task_params = None
+        with open(os.environ["SEGMENTATION_TASK_CONFIG_FILE"],"r") as f:
+            segmentation_task_params = yaml.safe_load(f)["tasks"]
+
+        input_mapping = []
+        ref_modality = "image"
+        nifti_loader_ops = {}
+        for modality in segmentation_task_params[os.environ["SEGMENTATION_TASK_NAME"]]["Modalities"]:
+            nifti_loader_ops[modality] = NiftiDataLoader(self, CountCondition(self, 1), input_path=app_input_path, name=f"{modality.lower()}_nifti_loader_op", modality_mapping=segmentation_task_params[os.environ["SEGMENTATION_TASK_NAME"]]["Modalities"][modality]["File_Pattern"])
+            input_mapping.append(IOMapping(modality, Image, IOType.IN_MEMORY))
+
+        if "Reference_Modality" in segmentation_task_params[os.environ["SEGMENTATION_TASK_NAME"]]:
+            ref_modality = segmentation_task_params[os.environ["SEGMENTATION_TASK_NAME"]]["Reference_Modality"]
         # Create the custom operator(s) as well as SDK built-in operator(s).
-        nifti_loader_op = NiftiDataLoader(
-            self, CountCondition(self, 1), input_path=app_input_path, name="nifti_loader_op", modality_mapping=".nii.gz"
-        )
+
         # Create the inference operator that supports MONAI Bundle and automates the inference.
         # The IOMapping labels match the input and prediction keys in the pre and post processing.
         # The model_name is optional when the app has only one model.
@@ -75,13 +75,14 @@ class AISpleenNIFTIMONetSegApp(Application):
 
         config_names = BundleConfigNames(config_names=["inference"])  # Same as the default
 
-        bundle_spleen_seg_op = MONetBundleInferenceOperator(
+        bundle_seg_op = MONetBundleInferenceOperator(
             self,
-            input_mapping=[IOMapping("image", Image, IOType.IN_MEMORY)],
+            input_mapping=input_mapping,
             output_mapping=[IOMapping("pred", Image, IOType.IN_MEMORY)],
+            ref_modality=ref_modality,
             app_context=app_context,
             bundle_config_names=config_names,
-            name="monet_bundle_spleen_seg_op",
+            name="monet_bundle_seg_op",
         )
 
         # Create DICOM Seg writer providing the required segment description for each segment with
@@ -108,9 +109,11 @@ class AISpleenNIFTIMONetSegApp(Application):
 
         # Create the processing pipeline, by specifying the source and destination operators, and
         # ensuring the output from the former matches the input of the latter, in both name and type.
-        self.add_flow(nifti_loader_op, bundle_spleen_seg_op, {("image", "image")})
+        for modality in segmentation_task_params[os.environ["SEGMENTATION_TASK_NAME"]]["Modalities"]:
+            self.add_flow(nifti_loader_ops[modality], bundle_seg_op, {("image", modality)})
+
         # Note below the dicom_seg_writer requires two inputs, each coming from a source operator.
-        self.add_flow(bundle_spleen_seg_op, nifti_seg_writer, {("pred", "seg_image")})
+        self.add_flow(bundle_seg_op, nifti_seg_writer, {("pred", "seg_image")})
         # Create the surface mesh STL conversion operator and add it to the app execution flow, if needed, by
         logging.info(f"End {self.compose.__name__}")
 
@@ -118,5 +121,5 @@ class AISpleenNIFTIMONetSegApp(Application):
 if __name__ == "__main__":
 
     logging.info(f"Begin {__name__}")
-    AISpleenNIFTIMONetSegApp().run()
+    AINIFTIMONetSegApp().run()
     logging.info(f"End {__name__}")
