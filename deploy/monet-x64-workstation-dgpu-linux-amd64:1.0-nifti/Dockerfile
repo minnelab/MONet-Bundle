@@ -159,4 +159,5 @@ COPY ./map/pkg.json /etc/holoscan/pkg.json
 
 COPY ./app /opt/holoscan/app
 
+COPY Segmentation_Task.yaml /etc/holoscan/Segmentation_Task.yaml
 ENTRYPOINT ["/var/holoscan/tools"]
