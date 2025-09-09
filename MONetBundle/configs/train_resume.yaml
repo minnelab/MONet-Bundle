@@ -15,7 +15,7 @@ train_handlers:
     output_transform: "$src.mlflow.mlflow_transform"
     dataset_dict:
         train: "@train#train_dataset"
-    dataset_keys: 'case_identifier'
+    dataset_keys: '@dataset_key'
     state_attributes:
     - "iteration"
     - "epoch"

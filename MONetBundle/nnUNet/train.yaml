@@ -3,7 +3,7 @@ train:
   pbar:
     _target_: "ignite.contrib.handlers.tqdm_logger.ProgressBar"
   dataloader: $@nnunet_trainer.dataloader_train
-  train_data: "$[{'case_identifier':k} for k in @nnunet_trainer.dataloader_train.generator._data.identifiers]"
+  train_data: "$[{@dataset_key:k} for k in @nnunet_trainer.dataloader_train.generator._data.identifiers]"
   train_dataset:
     _target_: Dataset
     data: "@train#train_data"

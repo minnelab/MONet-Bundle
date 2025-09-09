@@ -69,13 +69,14 @@ run:
 - $@validate#pbar.attach(@validate#evaluator,metric_names=['Val_Dice'])
 - $@train#trainer.run()
 tracking_uri: http://localhost:5000
+dataset_key: "case_identifier"
 train:
   dataloader: $@nnunet_trainer.dataloader_train
   inferer:
     _target_: SimpleInferer
   pbar:
     _target_: ignite.contrib.handlers.tqdm_logger.ProgressBar
-  train_data: $[{'case_identifier':k} for k in @nnunet_trainer.dataloader_train.generator._data.identifiers]
+  train_data: $[{@dataset_key:k} for k in @nnunet_trainer.dataloader_train.generator._data.identifiers]
   train_dataset:
     _target_: Dataset
     data: '@train#train_data'
@@ -106,7 +107,7 @@ train_handlers:
   - _target_: $src.mlflow.MLFlownnUNetHandler
     dataset_dict:
       train: '@train#train_dataset'
-    dataset_keys: case_identifier
+    dataset_keys: '@dataset_key'
     experiment_name: '@mlflow_experiment_name'
     experiment_param: $src.mlflow.create_mlflow_experiment_params( @bundle_root +
       '/nnUNet/params.yaml')
