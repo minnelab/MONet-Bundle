@@ -12,7 +12,7 @@ displayable_configs:
   tracking_uri: '@tracking_uri'
   modality_list: 'CT'
   Label_0: '@label_dict.0'
-  iterations: '@iterations'
+  iterations: '50'
 checkpoint:
   inference_allowed_mirroring_axes: $@nnunet_trainer.inference_allowed_mirroring_axes
   init_args: $@nnunet_trainer.my_init_kwargs
