@@ -126,7 +126,7 @@ class AIMONetSegApp(Application):
             self.add_flow(series_to_vol_ops[modality], bundle_seg_op, {("image", modality)})
           
 
-        if ref_modality is not "image":
+        if ref_modality != "image":
             self.add_flow(
                 series_selector_ops[ref_modality], dicom_seg_writer, {("study_selected_series_list", "study_selected_series_list")}
             )
