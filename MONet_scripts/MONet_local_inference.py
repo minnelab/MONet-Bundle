@@ -46,7 +46,7 @@ def get_arg_parser():
 
 def run_inference(model_name: str, username: str, input_image: str, output_folder: str):
     home = os.path.expanduser("~")
-    
+
     if Path(model_name).is_file():
         model_path = model_name
     else:

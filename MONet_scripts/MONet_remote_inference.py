@@ -5,22 +5,27 @@ from __future__ import annotations
 import argparse
 import json
 import os
+from pathlib import Path
 
+import pydicom
 import requests
 import SimpleITK as sitk
-from pathlib import Path
-import subprocess
-import pydicom
-from MONet.utils import get_available_models
 from pynetdicom.apps.storescu.storescu import main as storescu_main
+
+from MONet.utils import get_available_models
+
 
 def run_dicom_inference(input_path, output_path, model, username):
     # Find the first .dcm file in input_path or its subdirectories using pydicom
     dcm_file = None
     studyInstanceUID = None
+    if "DICOM_URL" in os.environ:
+        dicom_url = os.environ["DICOM_URL"]
+    else:
+        dicom_url = "localhost"
     if not Path(input_path).is_dir():
         studyInstanceUID = input_path
-    
+
     if studyInstanceUID is None:
         for root, _, files in os.walk(input_path):
             for file in files:
@@ -33,10 +38,10 @@ def run_dicom_inference(input_path, output_path, model, username):
             raise FileNotFoundError(f"No .dcm file found in {input_path} or its subdirectories.")
             return
         ds = pydicom.dcmread(dcm_file)
-        studyInstanceUID = ds.get('StudyInstanceUID', 'Unknown')
+        studyInstanceUID = ds.get("StudyInstanceUID", "Unknown")
         print(f"Study Instance UID: {studyInstanceUID}")
         print(f"Patient ID: {ds.get('PatientID', 'Unknown')}")
-        subprocess.run(["python", "-m", "pynetdicom", "storescu","-r", "localhost", "30015", input_path])
+        storescu_main(["storescu", "-r", dicom_url, "4242", input_path])
     home = os.path.expanduser("~")
     auth_path = os.path.join(home, ".monet", f"{username}_auth.json")
     with open(auth_path, "r") as token_file:
@@ -52,7 +57,7 @@ def run_dicom_inference(input_path, output_path, model, username):
 
     headers = {"accept": "application/json", "Authorization": f"Bearer {token}"}  # Replace with your actual token
 
-    
+    allowed_label_names = ["spleen"]
     # Retrieve labels using requests
     info_response = requests.get(f"{maia_segmentation_portal_url}info/", headers=headers)
     if info_response.status_code == 200:
@@ -60,8 +65,10 @@ def run_dicom_inference(input_path, output_path, model, username):
         labels_info = []
         for i, label in enumerate(labels):
             label_name = label
+            if label_name not in allowed_label_names:
+                label_name = f"region {i}"
             model_name = "MAIA-Segmentation-Portal"
-            labels_info.append({"name": "region {}".format(i), "model_name": model_name})
+            labels_info.append({"name": label_name, "model_name": model_name})
     else:
         print(f"Failed to retrieve labels [{info_response.status_code}]: {info_response.text}")
         return
@@ -69,7 +76,7 @@ def run_dicom_inference(input_path, output_path, model, username):
         # 'device': 'NVIDIA GeForce RTX 2070 SUPER:0',
         # 'model_filename': 'model.ts',
         "image": studyInstanceUID,  # Use StudyInstanceUID as the image identifier
-        "output": "dicom_seg"
+        "output": "dicom_seg",
     }
     params_str = '{"label_info":['
     for idx, label in enumerate(labels_info):
@@ -77,9 +84,7 @@ def run_dicom_inference(input_path, output_path, model, username):
         if idx < len(labels_info) - 1:
             params_str += ","
     params_str += "]}"  # must be a JSON string
-    form_data = {
-        "params": params_str
-    }
+    form_data = {"params": params_str}
     print(f"Sending request with input: {input_path}")
     response = requests.post(url, headers=headers, params=params, data=form_data)
 
@@ -90,7 +95,8 @@ def run_dicom_inference(input_path, output_path, model, username):
     else:
         print(f"Request failed [{response.status_code}]: {response.text}")
     # You can now process dcm_files as needed
-    storescu_main(["storescu","localhost", "30015", output_path])
+    storescu_main(["storescu", dicom_url, "4242", output_path])
+
 
 def run_inference(input_path, output_path, model, username):
     if Path(input_path).is_dir():
