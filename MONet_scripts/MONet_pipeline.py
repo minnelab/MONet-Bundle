@@ -145,6 +145,8 @@ def get_arg_parser():
 
     parser = argparse.ArgumentParser(description="Pipeline for nnUNet")
     parser.add_argument("--config", type=str, help="Path to the config file")
+    
+    return parser
 
 
 def main():
