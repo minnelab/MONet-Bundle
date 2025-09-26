@@ -1,5 +1,6 @@
 # MONet Bundle
 
+[![Paper (LNCS)](https://img.shields.io/badge/Publication-LNCS%20Paper-green)](https://link.springer.com/chapter/10.1007/978-3-032-05663-4_10)
 [![Build](https://github.com/SimoneBendazzoli93/MONet-Bundle/actions/workflows/build.yaml/badge.svg)](https://github.com/SimoneBendazzoli93/MONet-Bundle/actions/workflows/build.yaml)
 
 [![Documentation Status](https://readthedocs.org/projects/monet-bundle/badge/?version=latest)](https://monet-bundle.readthedocs.io/en/latest/?badge=latest)
