@@ -32,7 +32,7 @@ Curious to try the models through a user-friendly web interface? Explore the new
 
 ## 2025-06-25 UPDATE: Check out the MONet Bundle for FedBraTS and FedLymphoma!
 The MONet Bundle has been used in the Federated Brain Tumor Segmentation [FedBraTS](./Projects/FedBraTS/README.md) and Federated Lymphoma Segmentation [FedLymphoma](./Projects/FedLymphoma/README.md) projects, which are described in the following paper:
-- [MONet-FL: Extending nnU-Net with MONAI for Clinical Federated Learning]()
+- [MONet-FL: Extending nnU-Net with MONAI for Clinical Federated Learning](https://link.springer.com/chapter/10.1007/978-3-032-05663-4_10)
 
 
 ## Download the MONet Bundle
