@@ -38,10 +38,16 @@ class TestMONetAuthHelpers(unittest.TestCase):
         )
 
     @patch("MONet.auth.decode")
-    def test_verify_valid_token_exists(self, mock_decode):
-        mock_decode.return_value = {"exp": time.time() + 3600}
+    @patch("MONet.auth.requests.post")
+    def test_verify_valid_token_exists(self, mock_post, mock_decode):
+        
+        expiration_time = time.time() + 3600
+        mock_decode.return_value = {"exp": expiration_time}
         self.assertTrue(verify_valid_token_exists(username=self.username))
-        mock_decode.return_value = {"exp": time.time() - 3600}
+        
+        mock_decode.return_value = {"exp": time.time() - 3600,"refresh_token": "test-refresh-token"}
+        mock_post.return_value = MagicMock(status_code=200, json=lambda: {"access_token": self.token, "refresh_token": "test-refresh-token"})
+        
         self.assertFalse(verify_valid_token_exists(username=self.username))
         self.assertFalse(verify_valid_token_exists(username="invalid-username"))
 
