@@ -1,5 +1,8 @@
 [run]
 branch = True
+source =
+    MONet
+    MONet_scripts
 omit =
     tests/*
     */__init__.py
