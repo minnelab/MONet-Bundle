@@ -7,6 +7,7 @@ import json
 import time
 import shutil
 import jwt
+import requests
 class TestMONetAuthHelpers(unittest.TestCase):
     
     
@@ -54,6 +55,16 @@ class TestMONetAuthHelpers(unittest.TestCase):
         expiration_time = time.time() - 3600
         mock_decode.return_value = {"exp": expiration_time}
         self.assertTrue(verify_valid_token_exists(username=self.username))
+        
+        
+    @patch("MONet.auth.decode")
+    @patch("MONet.auth.requests.post")
+    def test_verify_valid_token_exists_with_expired_token_and_request_exception(self, mock_post, mock_decode):
+        
+        mock_post.side_effect = requests.RequestException("Request exception")
+        expiration_time = time.time() - 3600
+        mock_decode.return_value = {"exp": expiration_time}
+        self.assertFalse(verify_valid_token_exists(username=self.username))
     
     @patch("MONet.auth.json.load")
     @patch("MONet.auth.decode")
