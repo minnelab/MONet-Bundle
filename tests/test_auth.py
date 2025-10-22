@@ -41,6 +41,8 @@ class TestMONetAuthHelpers(unittest.TestCase):
     def test_verify_valid_token_exists(self, mock_decode):
         mock_decode.return_value = {"exp": time.time() + 3600}
         self.assertTrue(verify_valid_token_exists(username=self.username))
+        mock_decode.return_value = {"exp": time.time() - 3600}
+        self.assertFalse(verify_valid_token_exists(username=self.username))
         self.assertFalse(verify_valid_token_exists(username="invalid-username"))
 
     @patch("MONet.auth.decode")
