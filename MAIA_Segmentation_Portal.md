@@ -10,8 +10,8 @@ If you want to create your own MONet-based model, we provide instructions on how
 To start using the MAIA Segmentation Portal, you can install the GUI application.
 The GUI application is available for Windows and Linux.
 
-Download the Windows version of the MAIA Segmentation Portal from [here](https://github.com/SimoneBendazzoli93/MONet-Bundle/releases/download/v1.3/MAIA_Segmentation_Portal.exe)
-or the Linux version from [here](https://github.com/SimoneBendazzoli93/MONet-Bundle/releases/download/v1.3/MAIA_Segmentation_Portal_Linux)
+Download the Windows version of the MAIA Segmentation Portal from [here](https://github.com/minnelab/MONet-Bundle/releases/download/v1.3/MAIA_Segmentation_Portal.exe)
+or the Linux version from [here](https://github.com/minnelab/MONet-Bundle/releases/download/v1.3/MAIA_Segmentation_Portal_Linux)
 
 ## Installation
 To install the MAIA Segmentation Portal Python API:

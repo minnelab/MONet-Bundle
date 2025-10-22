@@ -37,10 +37,10 @@ The MONet Bundle has been used in the Federated Brain Tumor Segmentation [FedBra
 
 
 ## Download the MONet Bundle
-You can download the MONet Bundle from the following link: [MONet Bundle](https://raw.githubusercontent.com/SimoneBendazzoli93/MONet-Bundle/main/MONetBundle.zip)
+You can download the MONet Bundle from the following link: [MONet Bundle](https://raw.githubusercontent.com/minnelab/MONet-Bundle/main/MONetBundle.zip)
 ALternatively, you can use the following command to download the MONet Bundle:
 ```bash
-wget https://raw.githubusercontent.com/SimoneBendazzoli93/MONet-Bundle/main/MONetBundle.zip
+wget https://raw.githubusercontent.com/minnelab/MONet-Bundle/main/MONetBundle.zip
 ```
 or, through the Python Script:
 ```bash
@@ -53,7 +53,7 @@ To convert a trained nnUNet model to MONAI Bundle format, you can start with exp
 ```bash
 nnUNetv2_export_model_to_zip -d 009 -o Task09_Spleen.zip -c 3d_fullres -tr nnUNetTrainer -p nnUNetPlans -chk checkpoint_final.pth checkpoint_best.pth --not_strict
 ```
-For testing purposes, you can use the `Task09_Spleen.zip` file provided in this repository: https://github.com/SimoneBendazzoli93/nnUNet-MONAI-Bundle/releases/download/v1.0/Task09_Spleen.zip. This file contains a trained nnUNet model for the Spleen segmentation task, for only the `3d_fullres` configuration and the fold `0`.
+For testing purposes, you can use the `Task09_Spleen.zip` file provided in this repository: https://github.com/minnelab/MONet-Bundle/releases/download/v1.0/Task09_Spleen.zip. This file contains a trained nnUNet model for the Spleen segmentation task, for only the `3d_fullres` configuration and the fold `0`.
 
 
 
@@ -67,7 +67,7 @@ For testing purposes, you can use the `Task09_Spleen.zip` file provided in this 
 
 To run the conversion, you can use the following command:
 ```bash
-wget https://github.com/SimoneBendazzoli93/MONet-Bundle/releases/download/v1.0/Task09_Spleen.zip
+wget https://github.com/minnelab/MONet-Bundle/releases/download/v1.0/Task09_Spleen.zip
 MONet_run_conversion --bundle_path <MONAI_BUNDLE_PATH> --nnunet_model <NNUNET_CHECKPOINT_PATH>.zip --dataset_name_or_id <DATASET_NAME_OR_ID> --metadata_file <CUSTOM_METADATA_FILE>
 ```
 Where:
