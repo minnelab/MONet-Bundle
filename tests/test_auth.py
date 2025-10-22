@@ -52,6 +52,12 @@ class TestMONetAuthHelpers(unittest.TestCase):
         self.assertTrue(verify_valid_token_exists(username=self.username))
         
         self.assertFalse(verify_valid_token_exists(username="invalid-username"))
+        
+        with open(os.path.join(self.temp_home_dir, ".monet", f"{self.username}_auth.json"), "w") as f:
+            json.dump({}, f)
+            
+        self.assertFalse(verify_valid_token_exists(username=self.username))
+        
 
     @patch("MONet.auth.decode")
     def test_welcome_message(self, mock_decode):
