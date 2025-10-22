@@ -19,6 +19,9 @@ jobs:
       - name: Install dependencies
         run: pip install pytest pytest-cov
 
+      - name: Install MONet
+        run: pip install -e .
+
       - name: Run tests
         run: pytest --cov --cov-branch --cov-report=xml
 
