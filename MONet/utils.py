@@ -3,6 +3,7 @@ from __future__ import annotations
 import requests
 from loguru import logger
 
+
 def get_available_models(token, username):
     """
     Fetches available segmentation models for a given user from the remote portal.
