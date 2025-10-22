@@ -24,6 +24,8 @@
 ![GitHub release (with filter)](https://img.shields.io/github/v/release/minnelab/MONet-Bundle?logo=github)
 ![PyPI](https://img.shields.io/pypi/v/monet-bundle?logo=pypi)
 
+[![codecov](https://codecov.io/github/minnelab/MONet-Bundle/graph/badge.svg?token=QAOEQITEAX)](https://codecov.io/github/minnelab/MONet-Bundle)
+
 This repository contains the implementation of the MONet Bundle, with some instructions on how to use it and how to convert a generic nnUNet model to MONAI Bundle format.
 
 For more details about the MONet Bundle, please refer to the Jupyter notebook [MONet_Bundle.ipynb](./MONet_Bundle.ipynb).

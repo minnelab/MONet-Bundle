@@ -1,7 +1,7 @@
 import unittest
 import tempfile
 import os
-from MONet.auth import get_token, verify_valid_token_exists
+from MONet.auth import get_token, verify_valid_token_exists, welcome_message
 from unittest.mock import MagicMock, patch
 import json
 import time
@@ -42,3 +42,8 @@ class TestMONetAuthHelpers(unittest.TestCase):
         mock_decode.return_value = {"exp": time.time() + 3600}
         self.assertTrue(verify_valid_token_exists(username=self.username))
         self.assertFalse(verify_valid_token_exists(username="invalid-username"))
+
+    @patch("MONet.auth.decode")
+    def test_welcome_message(self, mock_decode):
+        mock_decode.return_value = {"exp": time.time() + 3600, "preferred_username": self.username}
+        self.assertEqual(welcome_message(token=self.token), f"Welcome {self.username}!")
