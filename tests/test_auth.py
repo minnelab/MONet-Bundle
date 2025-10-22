@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 import json
 import time
 import shutil
-
+import jwt
 class TestMONetAuthHelpers(unittest.TestCase):
     
     
@@ -39,26 +39,54 @@ class TestMONetAuthHelpers(unittest.TestCase):
         )
 
     @patch("MONet.auth.decode")
-    @patch("MONet.auth.requests.post")
-    def test_verify_valid_token_exists(self, mock_post, mock_decode):
+    def test_verify_valid_token_exists(self, mock_decode):
         
         expiration_time = time.time() + 3600
         mock_decode.return_value = {"exp": expiration_time}
         self.assertTrue(verify_valid_token_exists(username=self.username))
-        
-        mock_decode.return_value = {"exp": time.time() - 3600}
-        mock_post.return_value = MagicMock(status_code=200, json=lambda: {"access_token": self.token, "refresh_token": self.refresh_token})
-        
-        self.assertTrue(verify_valid_token_exists(username=self.username))
-        
-        self.assertFalse(verify_valid_token_exists(username="invalid-username"))
-        
-        with open(os.path.join(self.temp_home_dir, ".monet", f"{self.username}_auth.json"), "w") as f:
-            json.dump({}, f)
-            
-        self.assertFalse(verify_valid_token_exists(username=self.username))
-        
 
+    
+    @patch("MONet.auth.decode")
+    @patch("MONet.auth.requests.post")
+    def test_verify_valid_token_exists_with_expired_token(self, mock_post, mock_decode):
+        
+        mock_post.return_value = MagicMock(status_code=200, json=lambda: {"access_token": self.token, "refresh_token": self.refresh_token})
+        expiration_time = time.time() - 3600
+        mock_decode.return_value = {"exp": expiration_time}
+        self.assertTrue(verify_valid_token_exists(username=self.username))
+    
+    @patch("MONet.auth.json.load")
+    @patch("MONet.auth.decode")
+    def test_verify_valid_token_exists_with_expired_token_and_no_refresh_token(self, mock_decode, mock_load):
+        mock_load.return_value = {"access_token": self.token, "refresh_token": None}
+        expiration_time = time.time() - 3600
+        mock_decode.return_value = {"exp": expiration_time}
+        self.assertFalse(verify_valid_token_exists(username=self.username))
+    
+    @patch("MONet.auth.json.load")
+    def test_verify_valid_token_exists_with_no_access_token_in_auth_file(self, mock_load):
+        mock_load.return_value = {}
+        self.assertFalse(verify_valid_token_exists(username=self.username))
+    
+    
+    def test_verify_valid_token_exists_with_invalid_username(self):
+        self.assertFalse(verify_valid_token_exists(username="invalid-username"))
+    
+    @patch("MONet.auth.os.path.exists")
+    def test_verify_valid_token_exists_with_no_auth_file(self, mock_exists):
+        mock_exists.return_value = False
+        self.assertFalse(verify_valid_token_exists(username=self.username))
+
+    @patch("MONet.auth.decode")
+    def test_verify_valid_token_exists_with_expired_signature(self, mock_decode):
+        mock_decode.side_effect = jwt.ExpiredSignatureError("Expired signature")
+        self.assertFalse(verify_valid_token_exists(username=self.username))
+    
+    @patch("MONet.auth.decode")
+    def test_verify_valid_token_exists_with_decode_error(self, mock_decode):
+        mock_decode.side_effect = jwt.DecodeError("Decode error")
+        self.assertFalse(verify_valid_token_exists(username=self.username))
+    
     @patch("MONet.auth.decode")
     def test_welcome_message(self, mock_decode):
         mock_decode.return_value = {"exp": time.time() + 3600, "preferred_username": self.username}
