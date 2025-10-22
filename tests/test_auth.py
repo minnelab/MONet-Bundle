@@ -14,13 +14,14 @@ class TestMONetAuthHelpers(unittest.TestCase):
         self.username = "test@maia.se"
         self.password = "my-secret-password!"
         self.token = "test-token"
+        self.refresh_token = "test-refresh-token"
         
         self.temp_home_dir = tempfile.mkdtemp()
         os.environ["HOME"] = self.temp_home_dir
         os.makedirs(os.path.join(self.temp_home_dir, ".monet"), exist_ok=True)
         
         with open(os.path.join(self.temp_home_dir, ".monet", f"{self.username}_auth.json"), "w") as f:
-            json.dump({"access_token": self.token}, f)
+            json.dump({"access_token": self.token, "refresh_token": self.refresh_token}, f)
             
     def tearDown(self):
         shutil.rmtree(self.temp_home_dir)
@@ -45,10 +46,11 @@ class TestMONetAuthHelpers(unittest.TestCase):
         mock_decode.return_value = {"exp": expiration_time}
         self.assertTrue(verify_valid_token_exists(username=self.username))
         
-        mock_decode.return_value = {"exp": time.time() - 3600,"refresh_token": "test-refresh-token"}
-        mock_post.return_value = MagicMock(status_code=200, json=lambda: {"access_token": self.token, "refresh_token": "test-refresh-token"})
+        mock_decode.return_value = {"exp": time.time() - 3600}
+        mock_post.return_value = MagicMock(status_code=200, json=lambda: {"access_token": self.token, "refresh_token": self.refresh_token})
         
-        self.assertFalse(verify_valid_token_exists(username=self.username))
+        self.assertTrue(verify_valid_token_exists(username=self.username))
+        
         self.assertFalse(verify_valid_token_exists(username="invalid-username"))
 
     @patch("MONet.auth.decode")
