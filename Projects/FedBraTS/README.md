@@ -4,7 +4,7 @@
 
 This repository provides the necessary tools and instructions to run federated brain tumor segmentation, described in the paper [MONet-FL: Extending nnU-Net with MONAI for Clinical Federated Learning](). 
 
-The Federated training is performed following the tutorial [MONet-FL](https://github.com/SimoneBendazzoli93/MONet-Bundle/blob/main/MONet-FL.ipynb).
+The Federated training is performed following the tutorial [MONet-FL](https://github.com/minnelab/MONet-Bundle/blob/main/MONet-FL.ipynb).
 
 
 Data used in this study were obtained as part of the Challenge project through Synapse ID (syn64153430).
@@ -15,7 +15,7 @@ In detail, the 3 BraTS datasets used in the study are:
 - [BraTS 2025-MET](https://www.synapse.org/Synapse:syn64951882)
 
 ![](./images/Dataset.png)
-Each dataset is assigned to a different site, and the federated training is performed using the [MONet bundle](https://github.com/SimoneBendazzoli93/MONet-Bundle).
+Each dataset is assigned to a different site, and the federated training is performed using the [MONet bundle](https://github.com/minnelab/MONet-Bundle).
 
 
 ## FedBraTS Inference on Multimodal MRI [NIFTI Version]

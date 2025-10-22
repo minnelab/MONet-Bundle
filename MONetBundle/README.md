@@ -7,7 +7,7 @@ The MONet Bundle can be used to train and perform inference with nnUNet models.
 To install the MONet Bundle, you can use the following command:
 
 ```bash
-wget https://raw.githubusercontent.com/SimoneBendazzoli93/MONet-Bundle/main/MONetBundle.zip
+wget https://raw.githubusercontent.com/minnelab/MONet-Bundle/main/MONetBundle.zip
 unzip MONetBundle.zip
 ```
 

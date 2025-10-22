@@ -36,7 +36,7 @@ class MAIAInferenceApp(QWidget):
         super().__init__()
         # Get latest tag from GitHub for version
         try:
-            resp = requests.get("https://api.github.com/repos/SimoneBendazzoli93/MONet-Bundle/tags", timeout=3)
+            resp = requests.get("https://api.github.com/repos/minnelab/MONet-Bundle/tags", timeout=3)
             if resp.ok and resp.json():
                 version = resp.json()[0]["name"]
             else:

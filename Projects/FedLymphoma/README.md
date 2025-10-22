@@ -4,7 +4,7 @@
 
 This repository provides the necessary tools and instructions to run federated lymphoma segmentation, described in the paper [MONet-FL: Extending nnU-Net with MONAI for Clinical Federated Learning](). 
 
-The Federated training is performed following the tutorial [MONet-FL](https://github.com/SimoneBendazzoli93/MONet-Bundle/blob/main/MONet-FL.ipynb).
+The Federated training is performed following the tutorial [MONet-FL](https://github.com/minnelab/MONet-Bundle/blob/main/MONet-FL.ipynb).
 
 
 In detail, the 2 Lymphoma datasets used in the study are:
@@ -12,7 +12,7 @@ In detail, the 2 Lymphoma datasets used in the study are:
 - IndolentLymphoma-KUH, private collection of PET-CT of lymphoma patients and corresponding annotations from Karolinska University Hospital, Stockholm, Sweden
 
 ![](./images/Dataset.png)
-Each dataset is assigned to a different site, and the federated training is performed using the [MONet bundle](https://github.com/SimoneBendazzoli93/MONet-Bundle).
+Each dataset is assigned to a different site, and the federated training is performed using the [MONet bundle](https://github.com/minnelab/MONet-Bundle).
 
 ## FedLymphoma Inference on PET-CT [DICOM Version]
 

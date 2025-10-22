@@ -47,7 +47,7 @@ def pipeline(config):
             subprocess.run(
                 [
                     "wget",
-                    "https://raw.githubusercontent.com/SimoneBendazzoli93/MONet-Bundle/main/MONetBundle.zip",
+                    "https://raw.githubusercontent.com/minnelab/MONet-Bundle/main/MONetBundle.zip",
                     "-O",
                     str(Path(bundle_path).joinpath("MONetBundle.zip")),
                 ]
