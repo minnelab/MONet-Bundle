@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import requests
-
+from loguru import logger
 
 def get_available_models(token, username):
     """
@@ -25,7 +25,7 @@ def get_available_models(token, username):
             data={"id_token": token, "username": username},
         )
     except requests.RequestException as e:
-        print(f"Error fetching models: {e}")
+        logger.error(f"Error fetching models: {e}")
         return {}
     model_list = response.json()["models"]
 
