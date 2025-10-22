@@ -1,7 +1,7 @@
 # MONet Bundle
 
 [![Paper (LNCS)](https://img.shields.io/badge/Publication-LNCS%20Paper-green)](https://link.springer.com/chapter/10.1007/978-3-032-05663-4_10)
-[![Build](https://github.com/minnelab/MONet-Bundle/actions/workflows/build.yaml/badge.svg)](https://github.com/SimoneBendazzoli93/MONet-Bundle/actions/workflows/build.yaml)
+[![Build](https://github.com/minnelab/MONet-Bundle/actions/workflows/build.yaml/badge.svg)](https://github.com/minnelab/MONet-Bundle/actions/workflows/build.yaml)
 
 [![Documentation Status](https://readthedocs.org/projects/monet-bundle/badge/?version=latest)](https://monet-bundle.readthedocs.io/en/latest/?badge=latest)
 ![Version](https://img.shields.io/badge/MONet-v1.0-blue)
@@ -9,19 +9,19 @@
 ![Python](https://img.shields.io/badge/python-3.10+-orange)
 
 
-![GitHub Release Date - Published_At](https://img.shields.io/github/release-date/SimoneBendazzoli93/MONet-Bundle?logo=github)
-![GitHub contributors](https://img.shields.io/github/contributors/SimoneBendazzoli93/MONet-Bundle?logo=github)
-![GitHub top language](https://img.shields.io/github/languages/top/SimoneBendazzoli93/MONet-Bundle?logo=github)
-![GitHub language count](https://img.shields.io/github/languages/count/SimoneBendazzoli93/MONet-Bundle?logo=github)
-![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/SimoneBendazzoli93/MONet-Bundle/publish_release.yaml?logo=github)
-![GitHub all releases](https://img.shields.io/github/downloads/SimoneBendazzoli93/MONet-Bundle/total?logo=github)
+![GitHub Release Date - Published_At](https://img.shields.io/github/release-date/minnelab/MONet-Bundle?logo=github)
+![GitHub contributors](https://img.shields.io/github/contributors/minnelab/MONet-Bundle?logo=github)
+![GitHub top language](https://img.shields.io/github/languages/top/minnelab/MONet-Bundle?logo=github)
+![GitHub language count](https://img.shields.io/github/languages/count/minnelab/MONet-Bundle?logo=github)
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/minnelab/MONet-Bundle/publish_release.yaml?logo=github)
+![GitHub all releases](https://img.shields.io/github/downloads/minnelab/MONet-Bundle/total?logo=github)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/monet-bundle?logo=pypi)
-![GitHub](https://img.shields.io/github/license/SimoneBendazzoli93/MONet-Bundle?logo=github)
+![GitHub](https://img.shields.io/github/license/minnelab/MONet-Bundle?logo=github)
 ![PyPI - License](https://img.shields.io/pypi/l/monet-bundle?logo=pypi)
 
 
-![GitHub repo size](https://img.shields.io/github/repo-size/SimoneBendazzoli93/MONet-Bundle?logo=github)
-![GitHub release (with filter)](https://img.shields.io/github/v/release/SimoneBendazzoli93/MONet-Bundle?logo=github)
+![GitHub repo size](https://img.shields.io/github/repo-size/minnelab/MONet-Bundle?logo=github)
+![GitHub release (with filter)](https://img.shields.io/github/v/release/minnelab/MONet-Bundle?logo=github)
 ![PyPI](https://img.shields.io/pypi/v/monet-bundle?logo=pypi)
 
 This repository contains the implementation of the MONet Bundle, with some instructions on how to use it and how to convert a generic nnUNet model to MONAI Bundle format.
