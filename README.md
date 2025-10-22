@@ -4,7 +4,7 @@
 [![Build](https://github.com/minnelab/MONet-Bundle/actions/workflows/build.yaml/badge.svg)](https://github.com/minnelab/MONet-Bundle/actions/workflows/build.yaml)
 
 [![Documentation Status](https://readthedocs.org/projects/monet-bundle/badge/?version=latest)](https://monet-bundle.readthedocs.io/en/latest/?badge=latest)
-![Version](https://img.shields.io/badge/MONet-v1.0-blue)
+![Version](https://img.shields.io/badge/MONet-v1.3-blue)
 [![License](https://img.shields.io/badge/license-GPL%203.0-green.svg)](https://opensource.org/licenses/GPL-3.0)
 ![Python](https://img.shields.io/badge/python-3.10+-orange)
 
