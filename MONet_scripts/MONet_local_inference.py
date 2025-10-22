@@ -46,7 +46,11 @@ def get_arg_parser():
 
 def run_inference(model_name: str, username: str, input_image: str, output_folder: str):
     home = os.path.expanduser("~")
-    model_path = os.path.join(home, ".monet", "models", model_name + ".ts")
+
+    if Path(model_name).is_file():
+        model_path = model_name
+    else:
+        model_path = os.path.join(home, ".monet", "models", model_name + ".ts")
 
     if not os.path.exists(model_path):
         auth_path = os.path.join(home, ".monet", f"{username}_auth.json")

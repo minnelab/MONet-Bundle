@@ -28,6 +28,7 @@ from PyQt5.QtWidgets import (
 
 from MONet.auth import get_token, verify_valid_token_exists, welcome_message
 from MONet.utils import get_available_models
+from MONet_scripts.MONet_remote_inference import run_dicom_inference
 
 
 class MAIAInferenceApp(QWidget):
@@ -53,6 +54,8 @@ class MAIAInferenceApp(QWidget):
             if auth_files:
                 print("Found auth files:", auth_files)
                 self.username = auth_files[0].replace("_auth.json", "")
+            else:
+                self.username = ""
         except Exception:
             self.username = ""
 
@@ -215,7 +218,6 @@ class MAIAInferenceApp(QWidget):
         concat_modalities_btn.adjustSize()
         concat_modalities_btn.setFont(btn_font)
 
-        
         button_height = remote_infer_btn.sizeHint().height() * 2
         button_width = remote_infer_btn.sizeHint().width() * 2
 
@@ -234,7 +236,7 @@ class MAIAInferenceApp(QWidget):
         concat_modalities_btn.setMinimumHeight(button_height)
         concat_modalities_btn.setMinimumWidth(button_width)
         concat_modalities_btn.adjustSize()
-        
+
         # Add icon to the Remote Inference button
         with importlib.resources.path("MONet.icons", "Remote.png") as icon_path:
             remote_infer_btn.setIcon(QIcon(str(icon_path)))
@@ -247,7 +249,7 @@ class MAIAInferenceApp(QWidget):
             local_infer_btn.setIconSize(local_infer_btn.size())
             local_infer_btn.setStyleSheet("text-align: left; padding-left: 40px;")  # Align icon left, add padding for text
         layout.addWidget(local_infer_btn)
-        
+
         with importlib.resources.path("MONet.icons", "Models.png") as icon_path:
             model_info_btn.setIcon(QIcon(str(icon_path)))
             model_info_btn.setIconSize(model_info_btn.size())
@@ -643,7 +645,9 @@ class MAIAInferenceApp(QWidget):
             return
 
     def browse_input(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Select Input File", "", "NIfTI Files (*.nii.gz)")
+        path, _ = QFileDialog.getOpenFileName(self, "Select Input File", "", "NIfTI Files (*.nii.gz);;All Files (*)")
+        if not path:
+            path = QFileDialog.getExistingDirectory(self, "Select Input Directory", "")
         if path:
             self.input_path_input.setText(path)
 
@@ -664,6 +668,13 @@ class MAIAInferenceApp(QWidget):
 
         if not all([input_file, output_file, model]):
             QMessageBox.warning(self, "Missing Fields", "Please complete all fields.")
+            return
+
+        if Path(input_file).is_dir():
+            run_dicom_inference(input_file, output_file, model, self.username)
+            return
+        elif not Path(input_file).is_file():
+            run_dicom_inference(input_file, output_file, model, self.username)
             return
 
         base_url = self.models[model]
