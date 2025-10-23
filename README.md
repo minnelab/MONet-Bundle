@@ -1,3 +1,10 @@
+# ⚠️ Repository Archived
+
+This repository has been archived and is no longer maintained.
+
+👉 The active version of this project is now here:
+**[https://github.com/minnelab/MONet-Bundle]([https://github.com/minnelab/MONet-Bundle)**
+
 # MONet Bundle
 
 [![Paper (LNCS)](https://img.shields.io/badge/Publication-LNCS%20Paper-green)](https://link.springer.com/chapter/10.1007/978-3-032-05663-4_10)
