@@ -37,7 +37,6 @@ def define_affine_from_meta(meta: Dict[str, Any]) -> np.ndarray:
     np.ndarray
         A 4x4 affine matrix constructed from the metadata.
     """
-    print(meta)
     pixdim = meta["pixdim"]
     origin = meta["origin"]
     direction = meta["direction"].reshape(3, 3)
@@ -130,11 +129,6 @@ def concatenate(data: Dict[str, Any], ref_modality: str, output_folder: str) -> 
             except KeyError:
                 target_affine_4x4 = data[ref_modality].meta["affine"]
 
-            if "pixdim" not in data[modality].meta:
-                pixdim_array = np.array([data[ref_modality].meta[f"pixdim[{i}]"] for i in range(1, 4)])
-                data[modality].meta["pixdim"] = pixdim_array
-            else:
-                pixdim_array = data[modality].meta["pixdim"]
             data[modality] = resample(data[modality], dst_affine=target_affine_4x4, spatial_size=data[ref_modality].shape[1:])
     data = concatenate(data)["image"]
     save(data)
