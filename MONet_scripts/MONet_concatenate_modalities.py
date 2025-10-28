@@ -130,7 +130,11 @@ def concatenate(data: Dict[str, Any], ref_modality: str, output_folder: str) -> 
             except KeyError:
                 target_affine_4x4 = data[ref_modality].meta["affine"]
 
-            data[modality].meta["pixdim"] = data[ref_modality].meta["pixdim"]
+            if "pixdim" not in data[modality].meta:
+                pixdim_array = np.array([data[ref_modality].meta[f"pixdim[{i}]"] for i in range(1, 4)])
+                data[modality].meta["pixdim"] = pixdim_array
+            else:
+                pixdim_array = data[modality].meta["pixdim"]
             data[modality] = resample(data[modality], dst_affine=target_affine_4x4, spatial_size=data[ref_modality].shape[1:])
     data = concatenate(data)["image"]
     save(data)
@@ -157,7 +161,7 @@ def main():
         if subfolder.is_dir():
             data = {}
             for modality, filename in modality_mapping.items():
-                file_path = Path(subfolder).joinpath(subfolder.name + filename)
+                file_path = str(Path(subfolder).joinpath(subfolder.name + filename))
                 data[modality] = file_path
             concatenate(data, ref_modality, output_folder)
 
