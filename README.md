@@ -1,10 +1,3 @@
-# ⚠️ Repository Archived
-
-This repository has been archived and is no longer maintained.
-
-👉 The active version of this project is now here:
-**[https://github.com/minnelab/MONet-Bundle](https://github.com/minnelab/MONet-Bundle)**
-
 # MONet Bundle
 
 [![Paper (LNCS)](https://img.shields.io/badge/Publication-LNCS%20Paper-green)](https://link.springer.com/chapter/10.1007/978-3-032-05663-4_10)
@@ -123,5 +116,5 @@ The input folder should contain all the NIfTI files of the study you want to pro
 To run a MONAI Label server with the MONet Bundle, you can use the `MONet_MONAI_Label.py` script provided in this repository. This script will run a MONAI Label server with the MONet Bundle model, allowing you to interactively segment medical images using the trained model.
 You can run the script with the following command:
 ```bash
-MONet_MONAI_Label --docker-image spleen-x64-workstation-dgpu-linux-amd64:1.0-label --model_folder MONetBundle/models/fold_0
+MONet_MONAI_Label --docker-image monet-x64-workstation-dgpu-linux-amd64:1.0-label --model_folder MONetBundle/models/fold_0
 ```
