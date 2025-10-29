@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import json
 import os
-
+from loguru import logger
 import jwt
 import requests
 from jwt import decode
@@ -75,14 +75,14 @@ def verify_valid_token_exists(username: str) -> bool:
 
     try:
         decode(token, options={"verify_signature": False})
-        print(f"Token for {username} is valid.")
+        logger.info(f"Token for {username} is valid.")
         expiration = decode(token, options={"verify_signature": False}).get("exp")
         if expiration:
             expires_at = datetime.datetime.fromtimestamp(expiration, tz=datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-            print(f"Token expires at: {expires_at}")
+            logger.info(f"Token expires at: {expires_at}")
         # Check if token is expired
         if expiration and datetime.datetime.now(datetime.timezone.utc).timestamp() > expiration:
-            print("Token is expired.")
+            logger.info("Token is expired.")
             # Try to refresh the token using refresh_token if available
             refresh_token = token_data.get("refresh_token")
             if refresh_token:
@@ -95,10 +95,10 @@ def verify_valid_token_exists(username: str) -> bool:
                     # Save new token data to file
                     with open(auth_path, "w") as token_file:
                         json.dump(new_token_data, token_file)
-                    print("Token refreshed successfully.")
+                    logger.info("Token refreshed successfully.")
                     return True
                 except requests.RequestException as e:
-                    print(f"Failed to refresh token: {e}")
+                    logger.error(f"Failed to refresh token: {e}")
             return False
         return True
     except jwt.ExpiredSignatureError:
@@ -127,6 +127,6 @@ def welcome_message(token: str) -> str:
     expiration = decoded_token.get("exp")
     if expiration:
         expires_at = datetime.datetime.utcfromtimestamp(expiration).strftime("%Y-%m-%d %H:%M:%S UTC")
-        print(f"Token expires at: {expires_at}")
+        logger.info(f"Token expires at: {expires_at}")
 
     return f"Welcome {decoded_token.get('preferred_username', 'User')}!"

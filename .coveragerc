@@ -1,0 +1,15 @@
+[run]
+branch = True
+source =
+    MONet
+    MONet_scripts
+omit =
+    tests/*
+    */__init__.py
+    */_version.py
+    versioneer.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:

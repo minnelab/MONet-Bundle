@@ -8,7 +8,7 @@ RUN pip install monet-bundle
 
 ARG MONAILABEL=false
 RUN if [ "$MONAILABEL" = "true" ]; then \
-    pip install pytorch-ignite SimpleITK nibabel nilearn git+https://github.com/SimoneBendazzoli93/MONet-Bundle.git git+https://github.com/SimoneBendazzoli93/MONAILabel.git pydicom==2.4.4; \
+    pip install pytorch-ignite SimpleITK nibabel nilearn git+https://github.com/minnelab/MONet-Bundle.git git+https://github.com/SimoneBendazzoli93/MONAILabel.git pydicom==2.4.4; \
     fi
 WORKDIR /workspace
 

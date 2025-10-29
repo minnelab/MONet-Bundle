@@ -5,3 +5,4 @@ PyQt5
 requests
 pynetdicom
 pydicom
+loguru

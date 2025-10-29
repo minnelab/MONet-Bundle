@@ -8,28 +8,30 @@ This repository has been archived and is no longer maintained.
 # MONet Bundle
 
 [![Paper (LNCS)](https://img.shields.io/badge/Publication-LNCS%20Paper-green)](https://link.springer.com/chapter/10.1007/978-3-032-05663-4_10)
-[![Build](https://github.com/minnelab/MONet-Bundle/actions/workflows/build.yaml/badge.svg)](https://github.com/SimoneBendazzoli93/MONet-Bundle/actions/workflows/build.yaml)
+[![Build](https://github.com/minnelab/MONet-Bundle/actions/workflows/build.yaml/badge.svg)](https://github.com/minnelab/MONet-Bundle/actions/workflows/build.yaml)
 
 [![Documentation Status](https://readthedocs.org/projects/monet-bundle/badge/?version=latest)](https://monet-bundle.readthedocs.io/en/latest/?badge=latest)
-![Version](https://img.shields.io/badge/MONet-v1.0-blue)
+![Version](https://img.shields.io/badge/MONet-v1.3-blue)
 [![License](https://img.shields.io/badge/license-GPL%203.0-green.svg)](https://opensource.org/licenses/GPL-3.0)
 ![Python](https://img.shields.io/badge/python-3.10+-orange)
 
 
-![GitHub Release Date - Published_At](https://img.shields.io/github/release-date/SimoneBendazzoli93/MONet-Bundle?logo=github)
-![GitHub contributors](https://img.shields.io/github/contributors/SimoneBendazzoli93/MONet-Bundle?logo=github)
-![GitHub top language](https://img.shields.io/github/languages/top/SimoneBendazzoli93/MONet-Bundle?logo=github)
-![GitHub language count](https://img.shields.io/github/languages/count/SimoneBendazzoli93/MONet-Bundle?logo=github)
-![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/SimoneBendazzoli93/MONet-Bundle/publish_release.yaml?logo=github)
-![GitHub all releases](https://img.shields.io/github/downloads/SimoneBendazzoli93/MONet-Bundle/total?logo=github)
+![GitHub Release Date - Published_At](https://img.shields.io/github/release-date/minnelab/MONet-Bundle?logo=github)
+![GitHub contributors](https://img.shields.io/github/contributors/minnelab/MONet-Bundle?logo=github)
+![GitHub top language](https://img.shields.io/github/languages/top/minnelab/MONet-Bundle?logo=github)
+![GitHub language count](https://img.shields.io/github/languages/count/minnelab/MONet-Bundle?logo=github)
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/minnelab/MONet-Bundle/publish_release.yaml?logo=github)
+![GitHub all releases](https://img.shields.io/github/downloads/minnelab/MONet-Bundle/total?logo=github)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/monet-bundle?logo=pypi)
-![GitHub](https://img.shields.io/github/license/SimoneBendazzoli93/MONet-Bundle?logo=github)
+![GitHub](https://img.shields.io/github/license/minnelab/MONet-Bundle?logo=github)
 ![PyPI - License](https://img.shields.io/pypi/l/monet-bundle?logo=pypi)
 
 
-![GitHub repo size](https://img.shields.io/github/repo-size/SimoneBendazzoli93/MONet-Bundle?logo=github)
-![GitHub release (with filter)](https://img.shields.io/github/v/release/SimoneBendazzoli93/MONet-Bundle?logo=github)
+![GitHub repo size](https://img.shields.io/github/repo-size/minnelab/MONet-Bundle?logo=github)
+![GitHub release (with filter)](https://img.shields.io/github/v/release/minnelab/MONet-Bundle?logo=github)
 ![PyPI](https://img.shields.io/pypi/v/monet-bundle?logo=pypi)
+
+[![codecov](https://codecov.io/github/minnelab/MONet-Bundle/graph/badge.svg?token=QAOEQITEAX)](https://codecov.io/github/minnelab/MONet-Bundle)
 
 This repository contains the implementation of the MONet Bundle, with some instructions on how to use it and how to convert a generic nnUNet model to MONAI Bundle format.
 
@@ -44,10 +46,10 @@ The MONet Bundle has been used in the Federated Brain Tumor Segmentation [FedBra
 
 
 ## Download the MONet Bundle
-You can download the MONet Bundle from the following link: [MONet Bundle](https://raw.githubusercontent.com/SimoneBendazzoli93/MONet-Bundle/main/MONetBundle.zip)
+You can download the MONet Bundle from the following link: [MONet Bundle](https://raw.githubusercontent.com/minnelab/MONet-Bundle/main/MONetBundle.zip)
 ALternatively, you can use the following command to download the MONet Bundle:
 ```bash
-wget https://raw.githubusercontent.com/SimoneBendazzoli93/MONet-Bundle/main/MONetBundle.zip
+wget https://raw.githubusercontent.com/minnelab/MONet-Bundle/main/MONetBundle.zip
 ```
 or, through the Python Script:
 ```bash
@@ -60,7 +62,7 @@ To convert a trained nnUNet model to MONAI Bundle format, you can start with exp
 ```bash
 nnUNetv2_export_model_to_zip -d 009 -o Task09_Spleen.zip -c 3d_fullres -tr nnUNetTrainer -p nnUNetPlans -chk checkpoint_final.pth checkpoint_best.pth --not_strict
 ```
-For testing purposes, you can use the `Task09_Spleen.zip` file provided in this repository: https://github.com/SimoneBendazzoli93/nnUNet-MONAI-Bundle/releases/download/v1.0/Task09_Spleen.zip. This file contains a trained nnUNet model for the Spleen segmentation task, for only the `3d_fullres` configuration and the fold `0`.
+For testing purposes, you can use the `Task09_Spleen.zip` file provided in this repository: https://github.com/minnelab/MONet-Bundle/releases/download/v1.0/Task09_Spleen.zip. This file contains a trained nnUNet model for the Spleen segmentation task, for only the `3d_fullres` configuration and the fold `0`.
 
 
 
@@ -74,7 +76,7 @@ For testing purposes, you can use the `Task09_Spleen.zip` file provided in this 
 
 To run the conversion, you can use the following command:
 ```bash
-wget https://github.com/SimoneBendazzoli93/MONet-Bundle/releases/download/v1.0/Task09_Spleen.zip
+wget https://github.com/minnelab/MONet-Bundle/releases/download/v1.0/Task09_Spleen.zip
 MONet_run_conversion --bundle_path <MONAI_BUNDLE_PATH> --nnunet_model <NNUNET_CHECKPOINT_PATH>.zip --dataset_name_or_id <DATASET_NAME_OR_ID> --metadata_file <CUSTOM_METADATA_FILE>
 ```
 Where:

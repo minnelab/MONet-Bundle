@@ -19,7 +19,7 @@ def main():
     parser = get_arg_parser()
     args = parser.parse_args()
 
-    url = "https://raw.githubusercontent.com/SimoneBendazzoli93/MONet-Bundle/main/MONetBundle.zip"
+    url = "https://raw.githubusercontent.com/minnelab/MONet-Bundle/main/MONetBundle.zip"
     response = requests.get(url, stream=True)
     response.raise_for_status()
     with open(Path(args.bundle_path).joinpath("MONetBundle.zip"), "wb") as f:

@@ -48,7 +48,7 @@ RUN cd /opt/holoscan/monailabel && monailabel apps --download --name monaibundle
 RUN pip install pydicom==2.4.4 nilearn
 
 RUN mkdir -p /opt/holoscan/monailabel/monaibundle/model
-RUN cd /opt/holoscan/monailabel/monaibundle/model && wget https://raw.githubusercontent.com/SimoneBendazzoli93/MONet-Bundle/main/MONetBundle.zip
+RUN cd /opt/holoscan/monailabel/monaibundle/model && wget https://raw.githubusercontent.com/minnelab/MONet-Bundle/main/MONetBundle.zip
 RUN unzip /opt/holoscan/monailabel/monaibundle/model/MONetBundle.zip -d /opt/holoscan/monailabel/monaibundle/model/ 
 
 ENTRYPOINT ["/var/holoscan/tools"]
