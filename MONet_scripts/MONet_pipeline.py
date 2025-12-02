@@ -41,6 +41,7 @@ def pipeline(config):
                 dataset_name_or_id=config["dataset_name_or_id"],
                 trainer_class_name="nnUNetTrainer",
                 nnunet_plans_name="nnUNetPlans",
+                nnunet_config=config["nnunet_config"] if "nnunet_config" in config else "3d_fullres",
             )
         if step == "prepare_bundle":
             bundle_path = Path(config["bundle_config"]["bundle_root"]).parent
@@ -78,6 +79,7 @@ def pipeline(config):
                 tracking_uri=config["bundle_config"]["tracking_uri"],
                 skip_training=config["run_validation_only"] if "run_validation_only" in config else False,
                 resume_epoch="latest",
+                nnunet_config=config["nnunet_config"] if "nnunet_config" in config else "3d_fullres",
             )
         if step == "validate":
             validation_summary_dict, labels = validation_api(
@@ -87,6 +89,7 @@ def pipeline(config):
                 nnunet_plans_name="nnUNetPlans",
                 fold=0,
                 skip_prediction=True,
+                nnunet_config=config["nnunet_config"] if "nnunet_config" in config else "3d_fullres",
             )
             mlflow_token = None
             tracking_uri = config["bundle_config"]["tracking_uri"]
