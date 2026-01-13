@@ -73,7 +73,7 @@ def pipeline(config):
                 run_with_bundle=True,
                 bundle_root=config["bundle_config"]["bundle_root"],
                 continue_training=config["continue_training"] if "continue_training" in config else False,
-                fold=0,
+                fold=config["fold"] if "fold" in config else 0,
                 experiment_name=config["experiment_name"],
                 client_name=config["bundle_config"]["mlflow_run_name"][len("run_") :],
                 tracking_uri=config["bundle_config"]["tracking_uri"],
@@ -87,7 +87,7 @@ def pipeline(config):
                 config["dataset_name_or_id"],
                 trainer_class_name="nnUNetTrainer",
                 nnunet_plans_name="nnUNetPlans",
-                fold=0,
+                fold=config["fold"] if "fold" in config else 0,
                 skip_prediction=True,
                 nnunet_config=config["nnunet_config"] if "nnunet_config" in config else "3d_fullres",
             )
