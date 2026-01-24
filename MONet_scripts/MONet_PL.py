@@ -262,7 +262,7 @@ def loggers_and_callbacks(model):
         run_name=model.run_name,
         tags={
             "host": socket.gethostname(),
-            "fold": model.fold_id,
+            "fold": str(model.fold_id),
             "configuration": model.configuration,
             "trainer_class_name": model.trainer_class_name,
             "task": model.run_name,
