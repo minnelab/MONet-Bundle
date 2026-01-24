@@ -170,6 +170,10 @@ class MONetBundleModule(L.LightningModule):
                 "nnunet_configuration": self.parser.get_parsed_content("nnunet_configuration", instantiate=True),
             }
         )
+        
+        self.fold_id = self.parser.get_parsed_content("fold_id", instantiate=True)
+        self.configuration = self.parser.get_parsed_content("nnunet_configuration", instantiate=True)
+        self.trainer_class_name = self.parser.get_parsed_content("nnunet_trainer_class_name", instantiate=True)
 
         self.checkpoint = self.parser.get_parsed_content("checkpoint", instantiate=True)
         self.checkpoint_filename = self.parser.get_parsed_content("checkpoint_filename", instantiate=True)
@@ -255,10 +259,12 @@ def loggers_and_callbacks(model):
     pl_logger = MLFlowLogger(
         experiment_name=model.experiment_name,
         tracking_uri=model.mlflow_tracking_uri,
-        run_name="MONetBundle",
+        run_name=model.run_name,
         tags={
             "host": socket.gethostname(),
-            "fold": "0",
+            "fold": model.fold_id,
+            "configuration": model.configuration,
+            "trainer_class_name": model.trainer_class_name,
             "task": model.run_name,
             "job_id": os.environ["SLURM_JOB_ID"],
             "mlflow.runName": model.run_name,
