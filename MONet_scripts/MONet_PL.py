@@ -223,8 +223,14 @@ class MONetBundleModule(L.LightningModule):
 
         additional_metrics = {}
         for metric in self.train_additional_metrics:
-            additional_metrics[metric] = self.train_additional_metrics[metric].compute()
-            self.train_additional_metrics[metric].reset()
+            if len(self.train_additional_metrics[metric]) > 0:
+                for i in range(len(self.train_additional_metrics[metric])):
+                    class_name = self.label_dict[str(i+1)]
+                    additional_metrics[metric+f"_{class_name}"] = self.train_additional_metrics[metric][i].compute()
+                    self.train_additional_metrics[metric][i].reset()
+            else:
+                additional_metrics[metric] = self.train_additional_metrics[metric].compute()
+                self.train_additional_metrics[metric].reset()
 
         # self.logger.log_metrics(key_val_metric, self.current_epoch)
 
@@ -233,7 +239,7 @@ class MONetBundleModule(L.LightningModule):
             if len(additional_metrics[metric]) > 0:
                 for i in range(len(additional_metrics[metric])):
                     class_name = self.label_dict[str(i+1)]
-                    self.log(metric + f"_class_{class_name}", additional_metrics[metric][i], sync_dist=True)
+                    self.log(metric + f"_{class_name}", additional_metrics[metric][i], sync_dist=True)
             else:
                 self.log(metric, additional_metrics[metric], sync_dist=True)
 
@@ -245,8 +251,14 @@ class MONetBundleModule(L.LightningModule):
 
         additional_metrics = {}
         for metric in self.val_additional_metrics:
-            additional_metrics[metric] = self.val_additional_metrics[metric].compute()
-            self.val_additional_metrics[metric].reset()
+            if len(self.val_additional_metrics[metric]) > 0:
+                for i in range(len(self.val_additional_metrics[metric])):
+                    class_name = self.label_dict[str(i+1)]
+                    additional_metrics[metric+f"_{class_name}"] = self.val_additional_metrics[metric][i].compute()
+                    self.val_additional_metrics[metric][i].reset()
+            else:
+                additional_metrics[metric] = self.val_additional_metrics[metric].compute()
+                self.val_additional_metrics[metric].reset()
         # self.logger.log_metrics(key_val_metric, self.current_epoch)
 
         self.log("Val_Dice", key_val_metric, sync_dist=True)
@@ -254,7 +266,7 @@ class MONetBundleModule(L.LightningModule):
             if len(additional_metrics[metric]) > 0:
                 for i in range(len(additional_metrics[metric])):
                     class_name = self.label_dict[str(i+1)]
-                    self.log(metric + f"_class_{class_name}", additional_metrics[metric][i], sync_dist=True)
+                    self.log(metric + f"_{class_name}", additional_metrics[metric][i], sync_dist=True)
             else:
                 self.log(metric, additional_metrics[metric], sync_dist=True)
         return key_val_metric
