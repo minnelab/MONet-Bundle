@@ -170,7 +170,7 @@ class MONetBundleModule(L.LightningModule):
                 "nnunet_configuration": self.parser.get_parsed_content("nnunet_configuration", instantiate=True),
             }
         )
-        
+        self.label_dict = self.parser.get_parsed_content("label_dict", instantiate=True)
         self.fold_id = self.parser.get_parsed_content("fold_id", instantiate=True)
         self.configuration = self.parser.get_parsed_content("nnunet_configuration", instantiate=True)
         self.trainer_class_name = self.parser.get_parsed_content("nnunet_trainer_class_name", instantiate=True)
@@ -230,7 +230,12 @@ class MONetBundleModule(L.LightningModule):
 
         self.log("Train_Dice", key_train_metric, sync_dist=True)
         for metric in self.train_additional_metrics:
-            self.log(metric, additional_metrics[metric], sync_dist=True)
+            if len(additional_metrics[metric]) > 0:
+                for i in range(len(additional_metrics[metric])):
+                    class_name = self.label_dict[i+1]
+                    self.log(metric + f"_class_{class_name}", additional_metrics[metric][i], sync_dist=True)
+            else:
+                self.log(metric, additional_metrics[metric], sync_dist=True)
 
         return key_train_metric
 
@@ -246,7 +251,12 @@ class MONetBundleModule(L.LightningModule):
 
         self.log("Val_Dice", key_val_metric, sync_dist=True)
         for metric in self.val_additional_metrics:
-            self.log(metric, additional_metrics[metric], sync_dist=True)
+            if len(additional_metrics[metric]) > 0:
+                for i in range(len(additional_metrics[metric])):
+                    class_name = self.label_dict[i+1]
+                    self.log(metric + f"_class_{class_name}", additional_metrics[metric][i], sync_dist=True)
+            else:
+                self.log(metric, additional_metrics[metric], sync_dist=True)
         return key_val_metric
 
     def configure_optimizers(self):
