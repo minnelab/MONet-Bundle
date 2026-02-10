@@ -232,7 +232,7 @@ class MONetBundleModule(L.LightningModule):
         for metric in self.train_additional_metrics:
             if len(additional_metrics[metric]) > 0:
                 for i in range(len(additional_metrics[metric])):
-                    class_name = self.label_dict[i+1]
+                    class_name = self.label_dict[str(i+1)]
                     self.log(metric + f"_class_{class_name}", additional_metrics[metric][i], sync_dist=True)
             else:
                 self.log(metric, additional_metrics[metric], sync_dist=True)
@@ -253,7 +253,7 @@ class MONetBundleModule(L.LightningModule):
         for metric in self.val_additional_metrics:
             if len(additional_metrics[metric]) > 0:
                 for i in range(len(additional_metrics[metric])):
-                    class_name = self.label_dict[i+1]
+                    class_name = self.label_dict[str(i+1)]
                     self.log(metric + f"_class_{class_name}", additional_metrics[metric][i], sync_dist=True)
             else:
                 self.log(metric, additional_metrics[metric], sync_dist=True)
