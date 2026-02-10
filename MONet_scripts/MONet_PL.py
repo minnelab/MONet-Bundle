@@ -223,7 +223,8 @@ class MONetBundleModule(L.LightningModule):
 
         additional_metrics = {}
         for metric in self.train_additional_metrics:
-            if len(self.train_additional_metrics[metric]) > 0:
+            # Check if self.train_additional_metrics[metric] is a tensor with multiple values
+            if isinstance(self.train_additional_metrics[metric], torch.Tensor) and self.train_additional_metrics[metric].numel() > 1:
                 for i in range(len(self.train_additional_metrics[metric])):
                     class_name = self.label_dict[str(i+1)]
                     additional_metrics[metric+f"_{class_name}"] = self.train_additional_metrics[metric][i].compute()
@@ -236,7 +237,7 @@ class MONetBundleModule(L.LightningModule):
 
         self.log("Train_Dice", key_train_metric, sync_dist=True)
         for metric in self.train_additional_metrics:
-            if len(additional_metrics[metric]) > 0:
+            if isinstance(additional_metrics[metric], torch.Tensor) and additional_metrics[metric].numel() > 1:
                 for i in range(len(additional_metrics[metric])):
                     class_name = self.label_dict[str(i+1)]
                     self.log(metric + f"_{class_name}", additional_metrics[metric][i], sync_dist=True)
@@ -251,7 +252,7 @@ class MONetBundleModule(L.LightningModule):
 
         additional_metrics = {}
         for metric in self.val_additional_metrics:
-            if len(self.val_additional_metrics[metric]) > 0:
+            if isinstance(self.val_additional_metrics[metric], torch.Tensor) and self.val_additional_metrics[metric].numel() > 1:
                 for i in range(len(self.val_additional_metrics[metric])):
                     class_name = self.label_dict[str(i+1)]
                     additional_metrics[metric+f"_{class_name}"] = self.val_additional_metrics[metric][i].compute()
@@ -263,7 +264,7 @@ class MONetBundleModule(L.LightningModule):
 
         self.log("Val_Dice", key_val_metric, sync_dist=True)
         for metric in self.val_additional_metrics:
-            if len(additional_metrics[metric]) > 0:
+            if isinstance(additional_metrics[metric], torch.Tensor) and additional_metrics[metric].numel() > 1:
                 for i in range(len(additional_metrics[metric])):
                     class_name = self.label_dict[str(i+1)]
                     self.log(metric + f"_{class_name}", additional_metrics[metric][i], sync_dist=True)
