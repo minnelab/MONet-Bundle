@@ -38,6 +38,7 @@ setup(
         "console_scripts": [
             "MONet_concatenate_modalities = MONet_scripts.MONet_concatenate_modalities:main",
             "MONet_convert_ckpt_to_ts = MONet_scripts.MONet_convert_ckpt_to_ts:main",
+            "MONet_convert_ckpt_to_pt = MONet_scripts.MONet_convert_ckpt_to_pt:main",
             "MONet_login = MONet_scripts.MONet_login:main",
             "MONet_local_inference = MONet_scripts.MONet_local_inference:main",
             "MONet_convert_nnunet_checkpoint_to_bundle_checkpoint = MONet_scripts.MONet_convert_nnunet_checkpoint_to_bundle_checkpoint:main",
