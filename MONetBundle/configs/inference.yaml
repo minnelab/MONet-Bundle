@@ -61,6 +61,7 @@ nnunet_config_dict:
   nnunet_config: "@nnunet_config_ckpt"
   plans: "@plans"
   dataset_json: "@dataset_json"
+  device: "@device"
 
 network_def: "$monai.apps.nnunet.nnunet_bundle.get_nnunet_monai_predictor(**@nnunet_config_dict)"
 
