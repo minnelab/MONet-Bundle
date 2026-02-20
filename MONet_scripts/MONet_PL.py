@@ -374,7 +374,7 @@ def main():
         callbacks=callbacks,
         logger=logger,
         max_epochs=model.max_num_epochs,
-        num_sanity_val_steps=10,
+        num_sanity_val_steps=0,
         plugins=plugins,
         log_every_n_steps=num_train_batches_per_epoch,
         limit_train_batches=num_train_batches_per_epoch,
