@@ -211,10 +211,17 @@ class MONetBundleModule(L.LightningModule):
     def validation_step(self, batch, batch_idx):
         inputs, targets = self.prepare_batch(batch, self.device, True)
         outputs = self.network(inputs)
-        self.val_key_metric.update(self.output_transform(self.postprocessing({"pred": outputs, "label": targets})))
+        outputs = self.output_transform(self.postprocessing({"pred": outputs, "label": targets}))
+        if torch.isnan(outputs).any():
+            outputs = torch.where(torch.isnan(outputs), torch.ones_like(outputs), outputs)
+        
+        self.val_key_metric.update(outputs)
         for metric in self.val_additional_metrics:
+            additional_outputs = self.output_transform(self.postprocessing({"pred": outputs, "label": targets}))
+            if torch.isnan(additional_outputs).any():
+                additional_outputs = torch.where(torch.isnan(additional_outputs), torch.ones_like(additional_outputs), additional_outputs)
             self.val_additional_metrics[metric].update(
-                self.output_transform(self.postprocessing({"pred": outputs, "label": targets}))
+                additional_outputs
             )
 
     def on_train_epoch_end(self):
