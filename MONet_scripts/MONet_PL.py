@@ -305,7 +305,7 @@ def loggers_and_callbacks(model):
 
     callbacks = []
     checkpoint_cb = ModelCheckpoint(
-        dirpath=model.ckpt_dir, filename="{epoch}-{Val_Dice:.2f}", save_last=True, save_top_k=1, monitor="Val_Dice", mode="max"
+        dirpath=model.ckpt_dir, filename="{epoch}-{Val_Dice:.2f}", save_last=True, save_top_k=1, monitor="Val_Dice", mode="max", every_n_epochs=1
     )
     checkpoint_cb.CHECKPOINT_NAME_LAST = "{epoch}"
     callbacks.append(checkpoint_cb)
