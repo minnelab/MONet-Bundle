@@ -51,6 +51,8 @@ setup(
             "MONet_MONAI_Label = MONet_scripts.MONet_MONAI_Label:main",
             "MONet_pipeline = MONet_scripts.MONet_pipeline:main",
             "MONet_PL = MONet_scripts.MONet_PL:main",
+            "MONet_convert_bundle_checkpoint_to_nnunet_checkpoint = MONet_scripts.MONet_convert_bundle_checkpoint_to_nnunet_checkpoint:main",
+            "MONet_convert_torchscript_to_bundle = MONet_scripts.MONet_convert_torchscript_to_bundle:main",
         ],
     },
     keywords=["monai", "model inference", "pytorch", "monet bundle", "maia"],
