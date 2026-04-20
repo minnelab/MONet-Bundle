@@ -38,7 +38,7 @@ def export(bundle_root, checkpoint_name, nnunet_trainer_name="nnUNetTrainer", nn
         config["plans"] = plans["plans"]
 
     config["nnunet_trainer_class_name"] = nnunet_trainer_name
-    
+
     config["nnunet_configuration"] = nnunet_configuration
 
     config["network_def_predictor"] = "$@network_def.network_weights"
@@ -68,7 +68,6 @@ def get_arg_parser():
     parser.add_argument("--nnunet_trainer_name", type=str, default="nnUNetTrainer", help="Trainer name")
     parser.add_argument("--nnunet_configuration", type=str, default="3d_fullres", help="nnUNet configuration")
     parser.add_argument("--fold", type=int, default=0, help="Fold number")
-    parser.add_argument("--dataset_name_or_id", type=str, required=False, default="00", help="Dataset name or ID to convert")
     return parser
 
 
@@ -79,7 +78,13 @@ def main():
     nnunet_trainer_name = args.nnunet_trainer_name
     nnunet_configuration = args.nnunet_configuration
     fold = args.fold
-    export(bundle_root=bundle_root, checkpoint_name=checkpoint_name, nnunet_trainer_name=nnunet_trainer_name, nnunet_configuration=nnunet_configuration, fold=fold, dataset_name_or_id=dataset_name_or_id)
+    export(
+        bundle_root=bundle_root,
+        checkpoint_name=checkpoint_name,
+        nnunet_trainer_name=nnunet_trainer_name,
+        nnunet_configuration=nnunet_configuration,
+        fold=fold,
+    )
 
 
 if __name__ == "__main__":

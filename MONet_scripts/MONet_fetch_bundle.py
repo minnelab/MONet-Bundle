@@ -15,6 +15,7 @@ def get_arg_parser():
     parser.add_argument("--bundle_path", type=str, required=True, help="Path to save the MONet Bundle.")
     return parser
 
+
 def fetch_bundle(bundle_path: str):
     if not os.path.exists(bundle_path):
         os.makedirs(bundle_path)
@@ -30,12 +31,12 @@ def fetch_bundle(bundle_path: str):
     with zipfile.ZipFile(Path(bundle_path).joinpath("MONetBundle.zip"), "r") as zip_ref:
         zip_ref.extractall(bundle_path)
     print(f"MONet Bundle extracted to {bundle_path}")
-    
+
+
 def main():
     parser = get_arg_parser()
     args = parser.parse_args()
     fetch_bundle(args.bundle_path)
-   
 
 
 if __name__ == "__main__":

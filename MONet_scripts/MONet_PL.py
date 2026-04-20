@@ -224,10 +224,13 @@ class MONetBundleModule(L.LightningModule):
         additional_metrics = {}
         for metric in self.train_additional_metrics:
             # Check if self.train_additional_metrics[metric] is a tensor with multiple values
-            if isinstance(self.train_additional_metrics[metric], torch.Tensor) and self.train_additional_metrics[metric].numel() > 1:
+            if (
+                isinstance(self.train_additional_metrics[metric], torch.Tensor)
+                and self.train_additional_metrics[metric].numel() > 1
+            ):
                 for i in range(len(self.train_additional_metrics[metric])):
-                    class_name = self.label_dict[str(i+1)]
-                    additional_metrics[metric+f"_{class_name}"] = self.train_additional_metrics[metric][i].compute()
+                    class_name = self.label_dict[str(i + 1)]
+                    additional_metrics[metric + f"_{class_name}"] = self.train_additional_metrics[metric][i].compute()
                     self.train_additional_metrics[metric][i].reset()
             else:
                 additional_metrics[metric] = self.train_additional_metrics[metric].compute()
@@ -239,7 +242,7 @@ class MONetBundleModule(L.LightningModule):
         for metric in self.train_additional_metrics:
             if isinstance(additional_metrics[metric], torch.Tensor) and additional_metrics[metric].numel() > 1:
                 for i in range(len(additional_metrics[metric])):
-                    class_name = self.label_dict[str(i+1)]
+                    class_name = self.label_dict[str(i + 1)]
                     self.log(metric + f"_{class_name}", additional_metrics[metric][i], sync_dist=True)
             else:
                 self.log(metric, additional_metrics[metric], sync_dist=True)
@@ -254,8 +257,8 @@ class MONetBundleModule(L.LightningModule):
         for metric in self.val_additional_metrics:
             if isinstance(self.val_additional_metrics[metric], torch.Tensor) and self.val_additional_metrics[metric].numel() > 1:
                 for i in range(len(self.val_additional_metrics[metric])):
-                    class_name = self.label_dict[str(i+1)]
-                    additional_metrics[metric+f"_{class_name}"] = self.val_additional_metrics[metric][i].compute()
+                    class_name = self.label_dict[str(i + 1)]
+                    additional_metrics[metric + f"_{class_name}"] = self.val_additional_metrics[metric][i].compute()
                     self.val_additional_metrics[metric][i].reset()
             else:
                 additional_metrics[metric] = self.val_additional_metrics[metric].compute()
@@ -266,7 +269,7 @@ class MONetBundleModule(L.LightningModule):
         for metric in self.val_additional_metrics:
             if isinstance(additional_metrics[metric], torch.Tensor) and additional_metrics[metric].numel() > 1:
                 for i in range(len(additional_metrics[metric])):
-                    class_name = self.label_dict[str(i+1)]
+                    class_name = self.label_dict[str(i + 1)]
                     self.log(metric + f"_{class_name}", additional_metrics[metric][i], sync_dist=True)
             else:
                 self.log(metric, additional_metrics[metric], sync_dist=True)
@@ -303,7 +306,7 @@ def loggers_and_callbacks(model):
         mode="max",
         save_last=False,
         filename="{epoch}-{Val_Dice:.2f}",
-        save_top_k=1, 
+        save_top_k=1,
     )
 
     # 2. Latest Epoch Callback: Saves the most recent epoch, overwriting the previous one
@@ -317,7 +320,7 @@ def loggers_and_callbacks(model):
     )
     callbacks.append(checkpoint_best)
     callbacks.append(checkpoint_last)
-    
+
     callbacks.append(LearningRateMonitor(logging_interval="epoch"))
     plugins = None
 

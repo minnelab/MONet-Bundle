@@ -23,7 +23,7 @@ def run_dicom_inference(input_path, output_path, model, username):
         dicom_url = os.environ["DICOM_URL"]
     else:
         dicom_url = "localhost"
-    
+
     if "DICOM_PORT" in os.environ:
         dicom_port = os.environ["DICOM_PORT"]
     else:

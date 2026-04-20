@@ -11,7 +11,6 @@ except ImportError:
     convert_monai_bundle_to_nnunet = None
 
 
-
 def convert(dataset_name_or_id: str, bundle_root: str, fold: int):
     if os.path.exists(os.path.join(bundle_root, "configs", "inference.json")):
         with open(os.path.join(bundle_root, "configs", "inference.json"), "r") as f:
@@ -25,18 +24,15 @@ def convert(dataset_name_or_id: str, bundle_root: str, fold: int):
     nnunet_config["nnunet_trainer"] = inference_config["nnunet_trainer_class_name"]
     nnunet_config["nnunet_plans"] = "nnUNetPlans"
     nnunet_config["nnunet_config"] = inference_config["nnunet_configuration"]
-    inference_config["nnunet_config_ckpt"]['init_args'] = {'configuration': inference_config["nnunet_configuration"]}
+    inference_config["nnunet_config_ckpt"]["init_args"] = {"configuration": inference_config["nnunet_configuration"]}
     inference_config["nnunet_config_ckpt"]["trainer_name"] = inference_config["nnunet_trainer_class_name"]
-    
+
     torch.save(inference_config["nnunet_config_ckpt"], os.path.join(bundle_root, "models", "nnunet_checkpoint.pth"))
     with open(os.path.join(bundle_root, "models", "dataset.json"), "w") as f:
         json.dump(inference_config["dataset_json"], f)
     with open(os.path.join(bundle_root, "models", "plans.json"), "w") as f:
         json.dump(inference_config["plans"], f)
     convert_monai_bundle_to_nnunet(nnunet_config=nnunet_config, bundle_root_folder=bundle_root, fold=fold)
-    
-    
-    
 
 
 def get_arg_parser():
