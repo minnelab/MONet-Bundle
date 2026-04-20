@@ -13,7 +13,7 @@ from pathlib import Path
 import yaml
 
 
-def export(bundle_root, checkpoint_name, nnunet_trainer_name="nnUNetTrainer", fold=0):
+def export(bundle_root, checkpoint_name, nnunet_trainer_name="nnUNetTrainer", nnunet_configuration="3d_fullres", fold=0):
 
     with open(Path(bundle_root).joinpath("models", "plans.json"), "r") as f:
         plans = json.load(f)
@@ -38,6 +38,8 @@ def export(bundle_root, checkpoint_name, nnunet_trainer_name="nnUNetTrainer", fo
         config["plans"] = plans["plans"]
 
     config["nnunet_trainer_class_name"] = nnunet_trainer_name
+    
+    config["nnunet_configuration"] = nnunet_configuration
 
     config["network_def_predictor"] = "$@network_def.network_weights"
 
@@ -60,10 +62,11 @@ def export(bundle_root, checkpoint_name, nnunet_trainer_name="nnUNetTrainer", fo
 def get_arg_parser():
     import argparse
 
-    parser = argparse.ArgumentParser(description="Convert nnUNet checkpoint to TorchScript")
-    parser.add_argument("--bundle_root", type=str, required=True, help="Path to the nnUNet bundle root")
+    parser = argparse.ArgumentParser(description="Convert MONet Bundlecheckpoint to TorchScript")
+    parser.add_argument("--bundle_root", type=str, required=True, help="Path to the MONet Bundle root")
     parser.add_argument("--checkpoint_name", type=str, default="model.pt", help="Checkpoint name")
     parser.add_argument("--nnunet_trainer_name", type=str, default="nnUNetTrainer", help="Trainer name")
+    parser.add_argument("--nnunet_configuration", type=str, default="3d_fullres", help="nnUNet configuration")
     parser.add_argument("--fold", type=int, default=0, help="Fold number")
     parser.add_argument("--dataset_name_or_id", type=str, required=False, default="00", help="Dataset name or ID to convert")
     return parser
@@ -74,8 +77,9 @@ def main():
     bundle_root = args.bundle_root
     checkpoint_name = args.checkpoint_name
     nnunet_trainer_name = args.nnunet_trainer_name
+    nnunet_configuration = args.nnunet_configuration
     fold = args.fold
-    export(bundle_root=bundle_root, checkpoint_name=checkpoint_name, nnunet_trainer_name=nnunet_trainer_name, fold=fold)
+    export(bundle_root=bundle_root, checkpoint_name=checkpoint_name, nnunet_trainer_name=nnunet_trainer_name, nnunet_configuration=nnunet_configuration, fold=fold, dataset_name_or_id=dataset_name_or_id)
 
 
 if __name__ == "__main__":

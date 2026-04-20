@@ -93,9 +93,11 @@ class AINIFTIMONetSegApp(Application):
         id_prefix = ""
         files = list(Path(app_input_path).glob("*"))
         self._logger.info(f"Found files in directory {app_input_path}: {files}")
+        modality = list(segmentation_task_params[os.environ["SEGMENTATION_TASK_NAME"]]["Modalities"].keys())[0]
+        modality_suffix = segmentation_task_params[os.environ["SEGMENTATION_TASK_NAME"]]["Modalities"][modality]["File_Pattern"]
         for file in files:
-            if file.name.endswith(".nii.gz"):
-                id_prefix = file.name.replace(".nii.gz", "")
+            if file.name.endswith(modality_suffix):
+                id_prefix = file.name.replace(modality_suffix, "")
         output_file = Path(app_output_path).joinpath(id_prefix + ".nii.gz")
 
         if Path(output_file).is_file():
