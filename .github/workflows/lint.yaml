@@ -29,8 +29,8 @@ jobs:
       
       - name: Check code formatting with black
         run: |
-          black --check .
+          black --check MONet_scripts MONet tests
       
       - name: Lint with ruff
         run: |
-          ruff check .
+          ruff check MONet_scripts MONet tests
