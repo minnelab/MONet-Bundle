@@ -51,7 +51,7 @@ test_loader:
 device: "$torch.device('cuda')"
 
 nnunet_trainer_class_name: nnUNetTrainer
-nnunet_config_ckpt: 
+nnunet_configuration: 3d_fullres
 plans: 
 dataset_json: 
 
@@ -114,4 +114,4 @@ nnunet_config_ckpt:
   - 0
   - 1
   - 2
-  configuration: "3d_fullres"
+  configuration: "@nnunet_configuration"

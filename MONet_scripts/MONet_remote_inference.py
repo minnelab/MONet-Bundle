@@ -23,6 +23,11 @@ def run_dicom_inference(input_path, output_path, model, username):
         dicom_url = os.environ["DICOM_URL"]
     else:
         dicom_url = "localhost"
+    
+    if "DICOM_PORT" in os.environ:
+        dicom_port = os.environ["DICOM_PORT"]
+    else:
+        dicom_port = "4242"
     if not Path(input_path).is_dir():
         studyInstanceUID = input_path
 
@@ -41,7 +46,7 @@ def run_dicom_inference(input_path, output_path, model, username):
         studyInstanceUID = ds.get("StudyInstanceUID", "Unknown")
         print(f"Study Instance UID: {studyInstanceUID}")
         print(f"Patient ID: {ds.get('PatientID', 'Unknown')}")
-        storescu_main(["storescu", "-r", dicom_url, "4242", input_path])
+        storescu_main(["-r", dicom_url, dicom_port, input_path])
     home = os.path.expanduser("~")
     auth_path = os.path.join(home, ".monet", f"{username}_auth.json")
     with open(auth_path, "r") as token_file:
@@ -95,7 +100,7 @@ def run_dicom_inference(input_path, output_path, model, username):
     else:
         print(f"Request failed [{response.status_code}]: {response.text}")
     # You can now process dcm_files as needed
-    storescu_main(["storescu", dicom_url, "4242", output_path])
+    storescu_main([dicom_url, dicom_port, output_path])
 
 
 def run_inference(input_path, output_path, model, username):

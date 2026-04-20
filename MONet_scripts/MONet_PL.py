@@ -297,11 +297,27 @@ def loggers_and_callbacks(model):
     pl_logger.log_hyperparams(model.experiment_hyperparams)
 
     callbacks = []
-    checkpoint_cb = ModelCheckpoint(
-        dirpath=model.ckpt_dir, filename="{epoch}-{Val_Dice:.2f}", save_last=True, save_top_k=1, monitor="Val_Dice", mode="max", every_n_epochs=1
+    checkpoint_best = ModelCheckpoint(
+        dirpath=model.ckpt_dir,
+        monitor="Val_Dice",
+        mode="max",
+        save_last=False,
+        filename="{epoch}-{Val_Dice:.2f}",
+        save_top_k=1, 
     )
-    checkpoint_cb.CHECKPOINT_NAME_LAST = "{epoch}"
-    callbacks.append(checkpoint_cb)
+
+    # 2. Latest Epoch Callback: Saves the most recent epoch, overwriting the previous one
+    checkpoint_last = ModelCheckpoint(
+        dirpath=model.ckpt_dir,
+        monitor=None,  # We don't care about the metric here
+        filename="{epoch}",
+        save_last=True,
+        every_n_epochs=1,
+        save_top_k=1,
+    )
+    callbacks.append(checkpoint_best)
+    callbacks.append(checkpoint_last)
+    
     callbacks.append(LearningRateMonitor(logging_interval="epoch"))
     plugins = None
 
