@@ -21,18 +21,35 @@ def export(bundle_root, checkpoint_name, nnunet_trainer_name="nnUNetTrainer", nn
     with open(Path(bundle_root).joinpath("configs", "plans.yaml"), "w") as f:
         yaml.dump({"plans": plans}, f)
 
-    with open(Path(bundle_root).joinpath("models", "dataset.json"), "r") as f:
-        dataset_json = json.load(f)
+    import collections
+
+    def ordered_load_json(filename):
+        # Use object_pairs_hook to preserve dict order in JSON
+        with open(filename, "r") as f:
+            return json.load(f, object_pairs_hook=collections.OrderedDict)
+
+    def represent_ordereddict(dumper, data):
+        value = []
+        for item_key, item_value in data.items():
+            node_key = dumper.represent_data(item_key)
+            node_value = dumper.represent_data(item_value)
+            value.append((node_key, node_value))
+        return yaml.nodes.MappingNode(u'tag:yaml.org,2002:map', value)
+
+    yaml.add_representer(collections.OrderedDict, represent_ordereddict)
+
+    dataset_json = ordered_load_json(Path(bundle_root).joinpath("models", "dataset.json"))
 
     with open(Path(bundle_root).joinpath("configs", "dataset.yaml"), "w") as f:
-        yaml.dump({"dataset_json": dataset_json}, f)
+        yaml.dump({"dataset_json": dataset_json}, f, sort_keys=False)
+ 
 
     with open(str(Path(bundle_root).joinpath("configs", "inference.yaml")), "r") as f:
         config = yaml.safe_load(f)
 
-    with open(str(Path(bundle_root).joinpath("configs", "dataset.yaml")), "r") as f:
-        dataset_config = yaml.safe_load(f)
-        config["dataset_json"] = dataset_config["dataset_json"]
+    #with open(str(Path(bundle_root).joinpath("configs", "dataset.yaml")), "r") as f:
+    #    dataset_config = yaml.safe_load(f)
+    config["dataset_json"] = dataset_json
     with open(str(Path(bundle_root).joinpath("configs", "plans.yaml")), "r") as f:
         plans = yaml.safe_load(f)
         config["plans"] = plans["plans"]

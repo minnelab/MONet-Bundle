@@ -85,6 +85,7 @@ class AIMONetSegApp(Application):
             output_mapping=[IOMapping("pred", Image, IOType.IN_MEMORY)],
             app_context=app_context,
             ref_modality=ref_modality,
+            model_name=os.environ["MODEL_NAME"] if "MODEL_NAME" in os.environ else None,
             bundle_config_names=config_names,
             name="monet_bundle_seg_op",
         )

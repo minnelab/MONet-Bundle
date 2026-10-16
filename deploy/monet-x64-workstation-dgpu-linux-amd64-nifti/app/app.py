@@ -80,6 +80,7 @@ class AINIFTIMONetSegApp(Application):
             input_mapping=input_mapping,
             output_mapping=[IOMapping("pred", Image, IOType.IN_MEMORY)],
             ref_modality=ref_modality,
+            model_name=os.environ["MODEL_NAME"] if "MODEL_NAME" in os.environ else None,
             app_context=app_context,
             bundle_config_names=config_names,
             name="monet_bundle_seg_op",
